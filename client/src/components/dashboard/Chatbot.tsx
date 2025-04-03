@@ -21,17 +21,74 @@ const Chatbot = () => {
   const [message, setMessage] = useState("");
   const messagesEndRef = useRef<HTMLDivElement>(null);
   
+  // Custom fetch function for chat messages
+  const fetchChatMessages = async (): Promise<ChatMessage[]> => {
+    try {
+      const token = localStorage.getItem('token');
+      if (!token) {
+        throw new Error("Authentication required");
+      }
+      
+      const response = await fetch("/api/chat-messages", {
+        headers: {
+          "Authorization": `Bearer ${token}`
+        }
+      });
+      
+      if (!response.ok) {
+        if (response.status === 401) {
+          localStorage.removeItem('token');
+          localStorage.removeItem('acknowledged');
+          setLocation("/login");
+          throw new Error("Session expired");
+        }
+        throw new Error(`${response.status}: ${response.statusText}`);
+      }
+      
+      return await response.json();
+    } catch (error) {
+      console.error("Error fetching chat messages:", error);
+      throw error;
+    }
+  };
+  
   // Fetch chat messages
   const { data: messages, isLoading } = useQuery<ChatMessage[]>({
     queryKey: ["/api/chat-messages"],
+    queryFn: fetchChatMessages,
     enabled: isOpen,
+    refetchOnWindowFocus: false,
+    retry: 1
   });
   
   // Send message mutation
   const sendMessageMutation = useMutation({
     mutationFn: async (message: string) => {
-      const response = await apiRequest("POST", "/api/chat", { message });
-      return response.json();
+      const token = localStorage.getItem('token');
+      if (!token) {
+        throw new Error("Authentication required");
+      }
+      
+      const response = await fetch("/api/chat", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "Authorization": `Bearer ${token}`
+        },
+        body: JSON.stringify({ message })
+      });
+      
+      if (!response.ok) {
+        if (response.status === 401) {
+          localStorage.removeItem('token');
+          localStorage.removeItem('acknowledged');
+          setLocation("/login");
+          throw new Error("Session expired");
+        }
+        throw new Error(`${response.status}: ${response.statusText}`);
+      }
+      
+      return await response.json();
     },
     onSuccess: () => {
       // Invalidate the chat messages query to refetch
