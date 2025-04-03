@@ -1,11 +1,11 @@
 import { useState, useEffect, useRef } from "react";
-import { useAuth } from "@/context/AuthContext";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { apiRequest } from "@/lib/queryClient";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { useToast } from "@/hooks/use-toast";
+import { toast } from "@/hooks/use-toast";
+import { useLocation } from "wouter";
 
 interface ChatMessage {
   id: number;
@@ -15,8 +15,7 @@ interface ChatMessage {
 }
 
 const Chatbot = () => {
-  const { user } = useAuth();
-  const { toast } = useToast();
+  const [_, setLocation] = useLocation();
   const queryClient = useQueryClient();
   const [isOpen, setIsOpen] = useState(false);
   const [message, setMessage] = useState("");

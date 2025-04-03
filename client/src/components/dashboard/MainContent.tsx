@@ -1,14 +1,21 @@
 import { useState, useEffect } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { toast } from "@/hooks/use-toast";
-import { getDashboardData, DashboardData } from "@/lib/auth";
+import { DashboardData } from "@/lib/auth";
 import ProgressSummary from "./ProgressSummary";
 import ThreatScenarios from "./ThreatScenarios";
 import OrgPolicies from "./OrgPolicies";
 import { useLocation } from "wouter";
+import { apiRequest } from "@/lib/queryClient";
 
 interface MainContentProps {
   activeSection: string;
+}
+
+// Function to fetch dashboard data
+async function fetchDashboardData(): Promise<DashboardData> {
+  const response = await apiRequest("GET", "/api/dashboard");
+  return response.json();
 }
 
 const MainContent = ({ activeSection }: MainContentProps) => {
@@ -17,25 +24,26 @@ const MainContent = ({ activeSection }: MainContentProps) => {
   // Fetch dashboard data
   const { data, isLoading, error } = useQuery<DashboardData>({
     queryKey: ["/api/dashboard"],
-    queryFn: getDashboardData,
-    retry: 1,
-    onError: (error) => {
-      // If we get a 401 error, redirect to login
-      if (error instanceof Response && error.status === 401) {
-        setLocation("/login");
-      }
-    }
+    queryFn: fetchDashboardData
   });
-
+  
+  // Handle errors
   useEffect(() => {
     if (error) {
+      // Check for auth errors
+      if (error instanceof Error && error.message.includes("401")) {
+        localStorage.removeItem("token");
+        localStorage.removeItem("acknowledged");
+        setLocation("/login");
+      }
+      
       toast({
         title: "Error",
         description: "Failed to load dashboard data. Please try again later.",
         variant: "destructive",
       });
     }
-  }, [error, toast]);
+  }, [error, toast, setLocation]);
 
   // Render loading state
   if (isLoading) {
