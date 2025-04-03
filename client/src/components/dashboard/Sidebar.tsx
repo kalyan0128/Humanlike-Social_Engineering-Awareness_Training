@@ -1,6 +1,9 @@
-import { useAuth } from "@/context/AuthContext";
-import { useToast } from "@/hooks/use-toast";
+import { useEffect, useState } from "react";
+import { logoutUser, getCurrentUser } from "@/lib/auth";
+import { toast } from "@/hooks/use-toast";
+import { useLocation } from "wouter";
 import gannonLogo from "@assets/gu logo.jpg";
+import { User } from "@shared/schema";
 
 interface SidebarProps {
   activeSection: string;
@@ -8,15 +11,30 @@ interface SidebarProps {
 }
 
 const Sidebar = ({ activeSection, setActiveSection }: SidebarProps) => {
-  const { user, logout } = useAuth();
-  const { toast } = useToast();
+  const [user, setUser] = useState<User | null>(null);
+  const [_, setLocation] = useLocation();
+
+  useEffect(() => {
+    // Load user data on component mount
+    const loadUser = async () => {
+      try {
+        const userData = await getCurrentUser();
+        setUser(userData);
+      } catch (error) {
+        console.error("Failed to load user data", error);
+      }
+    };
+
+    loadUser();
+  }, []);
 
   const handleLogout = () => {
-    logout();
+    logoutUser();
     toast({
       title: "Logged out",
       description: "You have been successfully logged out.",
     });
+    setLocation("/login");
   };
 
   // Navigation items for the sidebar

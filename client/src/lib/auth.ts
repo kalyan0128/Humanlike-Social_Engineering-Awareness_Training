@@ -44,8 +44,68 @@ export const logoutUser = (): void => {
 
 // Function to get current user data
 export const getCurrentUser = async (): Promise<User> => {
-  const response = await apiRequest("GET", "/api/user");
-  return response.json();
+  try {
+    const response = await apiRequest("GET", "/api/user");
+    return response.json();
+  } catch (error) {
+    if (error instanceof Response && error.status === 401) {
+      // Clear token if it's invalid or expired
+      localStorage.removeItem("token");
+      localStorage.removeItem("acknowledged");
+    }
+    throw error;
+  }
+};
+
+// Function to get dashboard data
+export interface DashboardData {
+  userProgress: {
+    completedModules: number;
+    totalModules: number;
+    progressPercentage: number;
+    currentLevel: string;
+    xpPoints: number;
+    xpToNextLevel: number;
+    xpProgress: number;
+  };
+  recommendedModules: {
+    id: number;
+    title: string;
+    description: string;
+  }[];
+  latestThreats: {
+    id: number;
+    title: string;
+    description: string;
+    isNew: boolean;
+    isTrending: boolean;
+  }[];
+  policies: {
+    id: number;
+    title: string;
+    description: string;
+    category: string;
+  }[];
+  achievements: {
+    id: number;
+    title: string;
+    description: string;
+    icon: string;
+  }[];
+}
+
+export const getDashboardData = async (): Promise<DashboardData> => {
+  try {
+    const response = await apiRequest("GET", "/api/dashboard");
+    return response.json();
+  } catch (error) {
+    if (error instanceof Response && error.status === 401) {
+      // Clear token if it's invalid or expired
+      localStorage.removeItem("token");
+      localStorage.removeItem("acknowledged");
+    }
+    throw error;
+  }
 };
 
 // Function to check if user is authenticated

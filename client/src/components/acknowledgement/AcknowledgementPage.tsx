@@ -1,16 +1,18 @@
 import { useState } from "react";
-import { useAuth } from "@/context/AuthContext";
+import { setAcknowledgedStatus } from "@/lib/auth"; // Direct import from lib/auth
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
+import { useLocation } from "wouter";
 import gannonLogo from "@assets/gu logo.jpg";
 
 const AcknowledgementPage = () => {
   const [acknowledged, setAcknowledged] = useState(false);
-  const { setAcknowledged: setUserAcknowledged } = useAuth();
+  const [_, setLocation] = useLocation();
 
   const handleAcknowledge = () => {
     if (acknowledged) {
-      setUserAcknowledged(true);
+      setAcknowledgedStatus(true);
+      setLocation("/dashboard");
     }
   };
 

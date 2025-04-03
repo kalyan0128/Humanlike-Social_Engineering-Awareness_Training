@@ -1,56 +1,30 @@
 import { useState, useEffect } from "react";
 import { useQuery } from "@tanstack/react-query";
-import { useToast } from "@/hooks/use-toast";
+import { toast } from "@/hooks/use-toast";
+import { getDashboardData, DashboardData } from "@/lib/auth";
 import ProgressSummary from "./ProgressSummary";
 import ThreatScenarios from "./ThreatScenarios";
 import OrgPolicies from "./OrgPolicies";
+import { useLocation } from "wouter";
 
 interface MainContentProps {
   activeSection: string;
 }
 
-interface DashboardData {
-  userProgress: {
-    completedModules: number;
-    totalModules: number;
-    progressPercentage: number;
-    currentLevel: string;
-    xpPoints: number;
-    xpToNextLevel: number;
-    xpProgress: number;
-  };
-  recommendedModules: {
-    id: number;
-    title: string;
-    description: string;
-  }[];
-  latestThreats: {
-    id: number;
-    title: string;
-    description: string;
-    isNew: boolean;
-    isTrending: boolean;
-  }[];
-  policies: {
-    id: number;
-    title: string;
-    description: string;
-    category: string;
-  }[];
-  achievements: {
-    id: number;
-    title: string;
-    description: string;
-    icon: string;
-  }[];
-}
-
 const MainContent = ({ activeSection }: MainContentProps) => {
-  const { toast } = useToast();
+  const [_, setLocation] = useLocation();
   
   // Fetch dashboard data
   const { data, isLoading, error } = useQuery<DashboardData>({
     queryKey: ["/api/dashboard"],
+    queryFn: getDashboardData,
+    retry: 1,
+    onError: (error) => {
+      // If we get a 401 error, redirect to login
+      if (error instanceof Response && error.status === 401) {
+        setLocation("/login");
+      }
+    }
   });
 
   useEffect(() => {
