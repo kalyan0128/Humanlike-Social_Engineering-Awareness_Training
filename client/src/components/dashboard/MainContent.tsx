@@ -14,8 +14,33 @@ interface MainContentProps {
 
 // Function to fetch dashboard data
 async function fetchDashboardData(): Promise<DashboardData> {
-  const response = await apiRequest("GET", "/api/dashboard");
-  return response.json();
+  try {
+    const token = localStorage.getItem('token');
+    if (!token) {
+      throw new Error("No authentication token found");
+    }
+    
+    const response = await fetch("/api/dashboard", {
+      headers: {
+        "Authorization": `Bearer ${token}`
+      }
+    });
+    
+    if (!response.ok) {
+      if (response.status === 401) {
+        // Clear auth data if token is invalid
+        localStorage.removeItem('token');
+        localStorage.removeItem('acknowledged');
+        throw new Error("401: Session expired");
+      }
+      throw new Error(`${response.status}: ${response.statusText}`);
+    }
+    
+    return await response.json();
+  } catch (error) {
+    console.error("Dashboard data fetch error:", error);
+    throw error;
+  }
 }
 
 const MainContent = ({ activeSection }: MainContentProps) => {
