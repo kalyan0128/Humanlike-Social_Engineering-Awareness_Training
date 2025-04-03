@@ -1,0 +1,62 @@
+I want to develop a full-stack web application titled 'HumanLike-AwareBot: A Social Engineering Awareness Training Platform'. This platform will be used to increase employee awareness about social engineering threats and organizational policies through a gamified chatbot experience.
+
+The app should meet the following criteria and functionality:
+
+Core Features:
+User Authentication:
+
+The app should have a Login and Sign-up page where users can create an account and log in securely. If they don’t have an account, they should be able to sign up.
+
+Use JWT for authentication and password hashing for security.
+
+Project Acknowledgement Page:
+
+After logging in, the user should be redirected to an Acknowledgement Page that provides a brief description of the project and the purpose of the social engineering awareness program.
+
+User Dashboard:
+
+The Dashboard should be clean and user-friendly. The dashboard will have the following sections:
+
+Chatbot: Integrated as a real-time chatbot using an LLM (Language Learning Model) API to provide answers to user questions related to social engineering threats.
+
+Organization Awareness and Policy: Information about the organization’s policies and security measures.
+
+Social Engineering Threat Scenarios: A section that presents updated, real-world social engineering scenarios to the user.
+
+Gamified Training: The chatbot will guide users through training modules in a gamified manner (with points, achievements, or levels).
+
+Progress Tracker: A section that tracks the user's progress in completing the social engineering awareness training.
+
+Chatbot:
+
+The Chatbot should provide real-time answers using a LLM Model API. The chatbot should be present across all pages, ideally in a fixed position, for instant access.
+
+Technologies:
+
+Frontend: React, with responsive design for desktop and mobile.
+
+Backend: Flask to handle the APIs, user authentication, and data processing.
+
+Database: MongoDB for storing user data and SQLite for session and training data.
+
+Git for version control and collaboration.
+
+Deployment: The web app should be deployable on platforms like Heroku for the backend and Netlify for the frontend.
+
+Project Abstract:
+HumanLike-AwareBot is a gamified, chatbot-based platform aimed at increasing employee awareness of social engineering threats and organizational policies. Social engineering remains a significant cybersecurity threat due to the exploitation of human behavior. Traditional awareness methods are often passive and ineffective. Our objective is to develop an interactive web application that simulates real-world scenarios and tracks user responses. Using a Flask backend and React frontend, we have created a system that delivers dynamic scenarios, feedback, and user progress tracking. The chatbot enhances engagement by offering real-time information through a search bar and gamified training modules. This solution provides an enjoyable yet educational experience that helps organizations strengthen their security posture.
+
+Requirements for Output:
+Please generate the code structure for this full-stack application, including:
+
+Frontend: React components for user login/signup, project acknowledgement page, chatbot UI, dashboard, gamified training sections, and progress tracking.
+
+Backend: Flask API endpoints for user authentication, real-time chatbot integration with LLM API, and database connections (MongoDB for user data and SQLite for training progress).
+
+Database models for user data, progress tracking, and chatbot history.
+
+Basic styling for the application, using CSS, Bootstrap, or Material-UI.
+
+Comments explaining the code to help with understanding the structure and functionality.
+
+The app should be easy to extend and maintain, with clear separation between frontend and backend.
