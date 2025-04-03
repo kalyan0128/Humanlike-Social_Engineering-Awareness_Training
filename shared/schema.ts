@@ -94,6 +94,8 @@ export const insertUserSchema = createInsertSchema(users).pick({
   password: true,
   firstName: true,
   lastName: true,
+  level: true,
+  xpPoints: true,
 });
 
 export const insertTrainingModuleSchema = createInsertSchema(trainingModules).omit({

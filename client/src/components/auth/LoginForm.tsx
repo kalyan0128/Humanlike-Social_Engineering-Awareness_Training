@@ -2,7 +2,7 @@ import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
-import { loginUser } from "@/lib/auth"; // Direct import instead of context
+import { loginUser, loginAsGuest } from "@/lib/auth"; // Direct import instead of context
 import { toast } from "@/hooks/use-toast";
 import { Link, useLocation } from "wouter";
 import { Button } from "@/components/ui/button";
@@ -46,6 +46,28 @@ const LoginForm = () => {
       toast({
         title: "Login failed",
         description: error instanceof Error ? error.message : "Invalid email or password",
+        variant: "destructive",
+      });
+    } finally {
+      setIsLoading(false);
+    }
+  };
+  
+  const handleGuestLogin = async () => {
+    setIsLoading(true);
+    
+    try {
+      await loginAsGuest();
+      toast({
+        title: "Welcome, Guest!",
+        description: "You have successfully logged in as a guest.",
+      });
+      // Redirect to acknowledgement page after successful login
+      setLocation("/acknowledgement");
+    } catch (error) {
+      toast({
+        title: "Guest login failed",
+        description: error instanceof Error ? error.message : "Unable to login as guest",
         variant: "destructive",
       });
     } finally {
@@ -138,6 +160,18 @@ const LoginForm = () => {
           </Button>
         </form>
       </Form>
+      
+      <div className="mt-4">
+        <Button 
+          type="button"
+          variant="outline"
+          onClick={handleGuestLogin}
+          disabled={isLoading}
+          className="w-full border-primary text-primary hover:bg-primary/10 font-semibold py-2"
+        >
+          {isLoading ? "Logging in..." : "Continue as Guest"}
+        </Button>
+      </div>
       
       <div className="text-center mt-4">
         <p className="text-sm text-neutral-600">

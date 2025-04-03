@@ -124,6 +124,37 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
   
+  // Guest login endpoint
+  app.post("/api/auth/guest", async (req, res) => {
+    try {
+      // Check if a guest user already exists
+      let guestUser = await storage.getUserByEmail("guest@example.com");
+      
+      // Create guest user if doesn't exist
+      if (!guestUser) {
+        guestUser = await storage.createUser({
+          username: "guest",
+          firstName: "Guest",
+          lastName: "User",
+          email: "guest@example.com",
+          password: await bcrypt.hash("guest123", 10),
+          level: "BEGINNER",
+          xpPoints: 10
+        });
+      }
+      
+      // Create JWT token
+      const token = jwt.sign({ userId: guestUser.id }, JWT_SECRET, { expiresIn: "1d" });
+      
+      // Return user data (excluding password) and token
+      const { password: _, ...userWithoutPassword } = guestUser;
+      res.json({ user: userWithoutPassword, token });
+    } catch (error) {
+      console.error("Guest login error:", error);
+      res.status(500).json({ message: "Guest login failed" });
+    }
+  });
+  
   // User data endpoint (requires authentication)
   app.get("/api/user", authenticate, async (req, res) => {
     try {

@@ -25,6 +25,17 @@ export const loginUser = async (email: string, password: string): Promise<LoginR
   return data;
 };
 
+// Function to login as a guest
+export const loginAsGuest = async (): Promise<LoginResponse> => {
+  const response = await apiRequest("POST", "/api/auth/guest", {});
+  const data: LoginResponse = await response.json();
+  
+  // Store token in localStorage for persistence
+  localStorage.setItem("token", data.token);
+  
+  return data;
+};
+
 // Function to signup user
 export const signupUser = async (signupData: SignupData): Promise<LoginResponse> => {
   const response = await apiRequest("POST", "/api/auth/signup", signupData);
