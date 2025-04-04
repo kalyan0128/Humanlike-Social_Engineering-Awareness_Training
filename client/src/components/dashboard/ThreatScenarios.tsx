@@ -1,5 +1,6 @@
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
+import { useLocation } from "wouter";
 
 interface ThreatScenariosProps {
   threats?: {
@@ -13,12 +14,19 @@ interface ThreatScenariosProps {
 }
 
 const ThreatScenarios = ({ threats, className = "" }: ThreatScenariosProps) => {
+  const [_, setLocation] = useLocation();
+  
   return (
     <Card className={`bg-white rounded-lg shadow-sm ${className}`}>
       <CardContent className="p-4">
         <div className="flex justify-between items-center mb-4">
           <h2 className="text-lg font-semibold">Latest Threat Scenarios</h2>
-          <a href="#scenarios" className="text-primary hover:text-primary-dark text-sm font-semibold">View All</a>
+          <button 
+            onClick={() => setLocation('/dashboard#scenarios')}
+            className="text-primary hover:text-primary-dark text-sm font-semibold"
+          >
+            View All
+          </button>
         </div>
         
         <div className="space-y-4">
@@ -30,7 +38,8 @@ const ThreatScenarios = ({ threats, className = "" }: ThreatScenariosProps) => {
                   threat.isNew 
                     ? "border-warning" 
                     : "border-danger"
-                } bg-neutral-50 p-3 rounded-r-md`}
+                } bg-neutral-50 p-3 rounded-r-md cursor-pointer`}
+                onClick={() => setLocation(`/scenarios/${threat.id}`)}
               >
                 <div className="flex justify-between items-start">
                   <h3 className="font-semibold text-neutral-800">{threat.title}</h3>
@@ -51,6 +60,10 @@ const ThreatScenarios = ({ threats, className = "" }: ThreatScenariosProps) => {
                 <Button
                   variant="link"
                   className="text-sm text-primary hover:text-primary-dark font-semibold p-0 h-auto flex items-center space-x-1"
+                  onClick={(e) => {
+                    e.stopPropagation(); // Prevent triggering the parent onClick
+                    setLocation(`/scenarios/${threat.id}`);
+                  }}
                 >
                   <span>Practice Scenario</span>
                   <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">

@@ -1,5 +1,6 @@
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
+import { useLocation } from "wouter";
 
 interface OrgPoliciesProps {
   policies?: {
@@ -11,12 +12,19 @@ interface OrgPoliciesProps {
 }
 
 const OrgPolicies = ({ policies }: OrgPoliciesProps) => {
+  const [_, setLocation] = useLocation();
+  
   return (
     <Card className="bg-white rounded-lg shadow-sm">
       <CardContent className="p-4">
         <div className="flex justify-between items-center mb-4">
           <h2 className="text-lg font-semibold">Organization Policies</h2>
-          <a href="#policies" className="text-primary hover:text-primary-dark text-sm font-semibold">View All</a>
+          <button 
+            onClick={() => setLocation('/dashboard#policies')}
+            className="text-primary hover:text-primary-dark text-sm font-semibold"
+          >
+            View All
+          </button>
         </div>
         
         <div className="space-y-3">
@@ -25,6 +33,7 @@ const OrgPolicies = ({ policies }: OrgPoliciesProps) => {
               <div 
                 key={policy.id}
                 className="border border-neutral-200 rounded p-3 hover:bg-neutral-50 transition duration-150 cursor-pointer"
+                onClick={() => setLocation(`/policies/${policy.id}`)}
               >
                 <h3 className="font-medium text-neutral-800">{policy.title}</h3>
                 <p className="text-sm text-neutral-600">{policy.description}</p>
@@ -40,6 +49,7 @@ const OrgPolicies = ({ policies }: OrgPoliciesProps) => {
             <Button 
               variant="link"
               className="w-full py-2 text-center text-primary hover:text-primary-dark font-semibold text-sm"
+              onClick={() => setLocation('/dashboard#policies')}
             >
               Show More
             </Button>
