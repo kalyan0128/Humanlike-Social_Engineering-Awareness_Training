@@ -43,8 +43,8 @@ const AcknowledgementPage = () => {
               <div>
                 <h4 className="font-semibold text-primary">Team Members</h4>
                 <ul className="list-disc pl-5 mt-2">
-                  <li>Kalyankumar Konda</li>
-                  <li>Baji Narra</li>
+                  <li>Kalyankumar Konda <span className="text-sm text-neutral-600">(Konda005@gannon.edu)</span></li>
+                  <li>Baji Narra <span className="text-sm text-neutral-600">(Narra006@gannon.edu)</span></li>
                 </ul>
               </div>
               
@@ -53,6 +53,7 @@ const AcknowledgementPage = () => {
                 <p className="mt-2">Samuel Tweneboah-Koduah, Ph.D.</p>
                 <p className="text-sm text-neutral-600">Assistant Professor, Computer Science</p>
                 <p className="text-sm text-neutral-600">Gannon University</p>
+                <p className="text-sm text-neutral-600">(tweneboa001@gannon.edu)</p>
               </div>
             </div>
           </div>
