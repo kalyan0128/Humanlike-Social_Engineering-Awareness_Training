@@ -193,7 +193,7 @@ const MainContent = ({ activeSection }: MainContentProps) => {
                     <div 
                       key={moduleData.id}
                       className="border border-neutral-200 rounded-lg p-4 hover:bg-neutral-50 cursor-pointer transition duration-150"
-                      onClick={() => window.open(`/training/${moduleData.id}`, '_blank')}
+                      onClick={() => setLocation(`/training/${moduleData.id}`)}
                     >
                       <div className="flex items-start justify-between">
                         <div>
@@ -258,7 +258,7 @@ const MainContent = ({ activeSection }: MainContentProps) => {
                     <div 
                       key={threatData.id}
                       className="border border-neutral-200 rounded-lg p-4 hover:bg-neutral-50 cursor-pointer transition duration-150"
-                      onClick={() => window.open(`/scenarios/${threatData.id}`, '_blank')}
+                      onClick={() => setLocation(`/scenarios/${threatData.id}`)}
                     >
                       <div className="flex items-start justify-between">
                         <div className="flex-1">
@@ -318,7 +318,7 @@ const MainContent = ({ activeSection }: MainContentProps) => {
                     <div 
                       key={policyData.id}
                       className="border border-neutral-200 rounded-lg p-4 hover:bg-neutral-50 cursor-pointer transition duration-150"
-                      onClick={() => window.open(`/policies/${policyData.id}`, '_blank')}
+                      onClick={() => setLocation(`/policies/${policyData.id}`)}
                     >
                       <div className="flex items-start">
                         <div className="p-2 rounded-md mr-3 flex-shrink-0 text-primary">
