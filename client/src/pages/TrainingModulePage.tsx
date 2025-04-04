@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { useLocation, Link, useParams } from "wouter";
 import { toast } from "@/hooks/use-toast";
-import { apiRequest } from "@/lib/queryClient";
+import { apiRequest, queryClient } from "@/lib/queryClient";
 import { TrainingModule } from "@shared/schema";
 import { ArrowLeft, Book, Award, CheckCircle, HelpCircle, AlertCircle, Check, X } from "lucide-react";
 import ReactMarkdown from 'react-markdown';
@@ -680,18 +680,15 @@ export default function TrainingModulePage() {
                     const token = localStorage.getItem('token');
                     if (!token) throw new Error("Authentication required");
                     
-                    await fetch('/api/user-progress', {
-                      method: 'POST',
-                      headers: {
-                        'Content-Type': 'application/json',
-                        'Authorization': `Bearer ${token}`
-                      },
-                      body: JSON.stringify({
-                        moduleId: module.id,
-                        completed: true,
-                        score: score
-                      })
+                    await apiRequest('POST', '/api/user-progress', {
+                      moduleId: module.id,
+                      completed: true,
+                      score: score
                     });
+                    
+                    // Invalidate the dashboard query to force a refresh
+                    queryClient.invalidateQueries({ queryKey: ["/api/dashboard"] });
+                    queryClient.invalidateQueries({ queryKey: ["/api/user"] });
                     
                     toast({
                       title: "Quiz Completed!",
@@ -730,18 +727,15 @@ export default function TrainingModulePage() {
                       const token = localStorage.getItem('token');
                       if (!token) throw new Error("Authentication required");
                       
-                      await fetch('/api/user-progress', {
-                        method: 'POST',
-                        headers: {
-                          'Content-Type': 'application/json',
-                          'Authorization': `Bearer ${token}`
-                        },
-                        body: JSON.stringify({
-                          moduleId: module.id,
-                          completed: true,
-                          score: null
-                        })
+                      await apiRequest('POST', '/api/user-progress', {
+                        moduleId: module.id,
+                        completed: true,
+                        score: null
                       });
+                      
+                      // Invalidate the dashboard query to force a refresh
+                      queryClient.invalidateQueries({ queryKey: ["/api/dashboard"] });
+                      queryClient.invalidateQueries({ queryKey: ["/api/user"] });
                       
                       toast({
                         title: "Module Completed!",
