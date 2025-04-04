@@ -86,23 +86,26 @@ interface QuizSectionProps {
 
 const QuizSection = ({ module, onComplete }: QuizSectionProps) => {
   const questions = parseQuizContent(module.content || "");
-  const [userAnswers, setUserAnswers] = useState<number[]>(Array(questions.length).fill(-1));
+  const [userAnswers, setUserAnswers] = useState<Record<number, number>>({});
   const [isSubmitted, setIsSubmitted] = useState(false);
   const [showExplanation, setShowExplanation] = useState<number[]>([]);
   
-  const handleAnswerChange = (questionIndex: number, answerIndex: number) => {
+  const handleAnswerChange = (questionIndex: number, value: string) => {
     if (isSubmitted) return; // Don't allow changes after submission
     
-    const newAnswers = [...userAnswers];
-    newAnswers[questionIndex] = answerIndex;
-    setUserAnswers(newAnswers);
+    setUserAnswers(prev => ({
+      ...prev,
+      [questionIndex]: parseInt(value)
+    }));
   };
   
   const handleSubmit = () => {
     if (isSubmitted) return;
     
     // Check if all questions have been answered
-    if (userAnswers.includes(-1)) {
+    const allAnswered = questions.every((_, index) => userAnswers[index] !== undefined);
+    
+    if (!allAnswered) {
       toast({
         title: "Incomplete Quiz",
         description: "Please answer all questions before submitting.",
@@ -171,107 +174,118 @@ const QuizSection = ({ module, onComplete }: QuizSectionProps) => {
       </p>
       
       <div className="space-y-8">
-        {questions.map((question, qIndex) => (
-          <div 
-            key={question.id} 
-            className={`border rounded-lg p-5 ${
-              isSubmitted 
-                ? userAnswers[qIndex] === question.correctAnswer
-                  ? 'border-green-300 bg-green-50'
-                  : 'border-red-300 bg-red-50'
-                : 'border-neutral-200'
-            }`}
-          >
-            <div className="flex justify-between items-start">
-              <h3 className="font-medium text-lg mb-3">{question.question}</h3>
-              {isSubmitted && (
-                <div className="ml-2 flex-shrink-0">
-                  {userAnswers[qIndex] === question.correctAnswer ? (
-                    <div className="text-green-600 bg-green-100 rounded-full p-1">
-                      <Check className="h-5 w-5" />
+        {questions.map((question, qIndex) => {
+          const userAnswer = userAnswers[qIndex];
+          const isCorrect = isSubmitted && userAnswer === question.correctAnswer;
+          const isWrong = isSubmitted && userAnswer !== undefined && !isCorrect;
+          
+          return (
+            <div 
+              key={question.id} 
+              className={`border rounded-lg p-5 ${
+                isSubmitted 
+                  ? isCorrect
+                    ? 'border-green-300 bg-green-50'
+                    : 'border-red-300 bg-red-50'
+                  : 'border-neutral-200'
+              }`}
+            >
+              <div className="flex justify-between items-start">
+                <h3 className="font-medium text-lg mb-3">{question.question}</h3>
+                {isSubmitted && (
+                  <div className="ml-2 flex-shrink-0">
+                    {isCorrect ? (
+                      <div className="text-green-600 bg-green-100 rounded-full p-1">
+                        <Check className="h-5 w-5" />
+                      </div>
+                    ) : (
+                      <div className="text-red-600 bg-red-100 rounded-full p-1">
+                        <X className="h-5 w-5" />
+                      </div>
+                    )}
+                  </div>
+                )}
+              </div>
+              
+              <RadioGroup 
+                value={userAnswer !== undefined ? userAnswer.toString() : undefined}
+                onValueChange={(value) => handleAnswerChange(qIndex, value)}
+                className="space-y-3"
+                disabled={isSubmitted}
+              >
+                {question.options.map((option, aIndex) => {
+                  const isOptionCorrect = aIndex === question.correctAnswer;
+                  const isUserSelection = aIndex === userAnswer;
+                  
+                  return (
+                    <div key={aIndex} className="flex items-center space-x-2">
+                      <RadioGroupItem
+                        id={`q${qIndex}-a${aIndex}`}
+                        value={aIndex.toString()}
+                        className={
+                          isSubmitted 
+                            ? isOptionCorrect
+                              ? "text-green-600 border-green-600"
+                              : isUserSelection
+                                ? "text-red-600 border-red-600"
+                                : ""
+                            : ""
+                        }
+                      />
+                      <Label 
+                        htmlFor={`q${qIndex}-a${aIndex}`}
+                        className={
+                          isSubmitted 
+                            ? isOptionCorrect
+                              ? "text-green-600 font-medium"
+                              : isUserSelection
+                                ? "text-red-600"
+                                : ""
+                            : ""
+                        }
+                      >
+                        {option}
+                        {isSubmitted && isOptionCorrect && (
+                          <span className="ml-2 text-green-600 text-sm">
+                            (Correct Answer)
+                          </span>
+                        )}
+                      </Label>
                     </div>
-                  ) : (
-                    <div className="text-red-600 bg-red-100 rounded-full p-1">
-                      <X className="h-5 w-5" />
+                  );
+                })}
+              </RadioGroup>
+              
+              {isWrong && (
+                <div className="mt-3">
+                  <Button 
+                    variant="outline" 
+                    size="sm"
+                    onClick={() => toggleExplanation(qIndex)}
+                    className="flex items-center text-sm text-neutral-600"
+                  >
+                    <HelpCircle className="h-4 w-4 mr-1" />
+                    {showExplanation.includes(qIndex) ? "Hide Explanation" : "Show Explanation"}
+                  </Button>
+                  
+                  {showExplanation.includes(qIndex) && (
+                    <div className="mt-2 text-sm p-3 bg-neutral-100 rounded-md text-neutral-700">
+                      <p className="font-medium">Explanation:</p>
+                      <p>
+                        The correct answer is "{question.options[question.correctAnswer]}".
+                        {question.options[userAnswer] && (
+                          <>
+                            <br />Your answer "{question.options[userAnswer]}" was incorrect.
+                          </>
+                        )}
+                      </p>
                     </div>
                   )}
                 </div>
               )}
             </div>
-            
-            <RadioGroup 
-              value={userAnswers[qIndex] >= 0 ? userAnswers[qIndex].toString() : undefined}
-              onValueChange={(value) => handleAnswerChange(qIndex, parseInt(value))}
-              className="space-y-3"
-              disabled={isSubmitted}
-            >
-              {question.options.map((option, aIndex) => (
-                <div key={aIndex} className="flex items-center space-x-2">
-                  <RadioGroupItem
-                    id={`q${qIndex}-a${aIndex}`}
-                    value={aIndex.toString()}
-                    className={
-                      isSubmitted 
-                        ? aIndex === question.correctAnswer
-                          ? "text-green-600 border-green-600"
-                          : userAnswers[qIndex] === aIndex
-                            ? "text-red-600 border-red-600"
-                            : ""
-                        : ""
-                    }
-                  />
-                  <Label 
-                    htmlFor={`q${qIndex}-a${aIndex}`}
-                    className={
-                      isSubmitted 
-                        ? aIndex === question.correctAnswer
-                          ? "text-green-600 font-medium"
-                          : userAnswers[qIndex] === aIndex
-                            ? "text-red-600"
-                            : ""
-                        : ""
-                    }
-                  >
-                    {option}
-                    {isSubmitted && aIndex === question.correctAnswer && (
-                      <span className="ml-2 text-green-600 text-sm">
-                        (Correct Answer)
-                      </span>
-                    )}
-                  </Label>
-                </div>
-              ))}
-            </RadioGroup>
-            
-            {isSubmitted && userAnswers[qIndex] !== question.correctAnswer && (
-              <div className="mt-3">
-                <Button 
-                  variant="outline" 
-                  size="sm"
-                  onClick={() => toggleExplanation(qIndex)}
-                  className="flex items-center text-sm text-neutral-600"
-                >
-                  <HelpCircle className="h-4 w-4 mr-1" />
-                  {showExplanation.includes(qIndex) ? "Hide Explanation" : "Show Explanation"}
-                </Button>
-                
-                {showExplanation.includes(qIndex) && (
-                  <div className="mt-2 text-sm p-3 bg-neutral-100 rounded-md text-neutral-700">
-                    <p className="font-medium">Explanation:</p>
-                    <p>
-                      The correct answer is "{question.options[question.correctAnswer]}".
-                      {question.options[userAnswers[qIndex]] && (
-                        <>
-                          <br />Your answer "{question.options[userAnswers[qIndex]]}" was incorrect.
-                        </>
-                      )}
-                    </p>
-                  </div>
-                )}
-              </div>
-            )}
-          </div>
-        ))}
+          );
+        })}
       </div>
       
       {!isSubmitted ? (
