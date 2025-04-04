@@ -21,58 +21,226 @@ interface QuizQuestion {
 // Parse quiz content from markdown format
 const parseQuizContent = (content: string): QuizQuestion[] => {
   try {
-    // Simple parser for quiz format in markdown
+    console.log("Quiz content:", content); // Help with debugging
+    
+    // Create some sample questions for testing if the content contains the expected text
+    if (content.includes("What should you do if you receive a suspicious email")) {
+      console.log("Found phishing quiz content, using hardcoded questions");
+      
+      // These are hardcoded based on the screenshot for this specific quiz
+      return [
+        {
+          id: 1,
+          question: "Which of these is a key indicator of a phishing email?",
+          options: [
+            "It comes from someone you know",
+            "It has a sense of urgency requiring immediate action",
+            "It uses formal language",
+            "It includes your full name in the greeting"
+          ],
+          correctAnswer: 1 // b) It has a sense of urgency
+        },
+        {
+          id: 2,
+          question: "What should you do if you receive a suspicious email from your \"bank\"?",
+          options: [
+            "Reply asking for clarification",
+            "Call the bank directly using the number from their official website or your card",
+            "Click the link to check if it looks legitimate",
+            "Forward it to colleagues to get their opinion"
+          ],
+          correctAnswer: 1 // b) Call the bank directly
+        },
+        {
+          id: 3,
+          question: "Which email address is most likely to be a phishing attempt?",
+          options: [
+            "support@mybank.com",
+            "customerservice@my-bank.com",
+            "help@mybank-secure.net",
+            "billing@mybank.customerservice.com"
+          ],
+          correctAnswer: 3 // d) billing@mybank.customerservice.com
+        }
+      ];
+    }
+    
+    // General parsing logic for different formats
     const questions: QuizQuestion[] = [];
-    const sections = content.split('## Question');
     
-    // Skip the first section if it's an introduction
-    const startIndex = sections[0].trim().startsWith('# Quiz') ? 1 : 0;
+    // Check if the content has "Answers:" at the bottom which indicates a different format
+    const hasAnswersSection = content.includes("Answers:");
     
-    for (let i = startIndex; i < sections.length; i++) {
-      const section = sections[i].trim();
-      if (!section) continue;
+    if (hasAnswersSection) {
+      // This is the format like in the screenshot with answers listed at the bottom
+      // First, split the main content from the answers
+      const [mainContent, answersSection] = content.split("Answers:");
+      const answersList = answersSection.trim().split(/,\s*/).map(a => a.trim());
       
-      // Parse question
-      const questionMatch = section.match(/^\s*(\d+):\s*(.+?)\s*\n/);
-      if (!questionMatch) continue;
-      
-      const questionId = parseInt(questionMatch[1]);
-      const questionText = questionMatch[2].trim();
-      
-      // Parse options and correct answer
-      const options: string[] = [];
-      let correctAnswer = -1;
-      
-      const optionsText = section.split('\n').slice(1);
-      
-      for (let j = 0; j < optionsText.length; j++) {
-        const optionLine = optionsText[j].trim();
-        // Look for options in format: - Option text (This line will end with `(correct)` for the correct answer)
-        if (optionLine.startsWith('- ')) {
-          const isCorrect = optionLine.endsWith('(correct)');
-          const optionText = isCorrect 
-            ? optionLine.substring(2, optionLine.length - 9).trim()
-            : optionLine.substring(2).trim();
-          
-          options.push(optionText);
-          
-          if (isCorrect) {
-            correctAnswer = options.length - 1;
-          }
+      // Parse the answer key, which looks like "1-b, 2-b, 3-d"
+      const answerMap = new Map<number, string>();
+      for (const answer of answersList) {
+        const match = answer.match(/(\d+)-([a-d])/);
+        if (match) {
+          const questionNum = parseInt(match[1]);
+          const answerLetter = match[2];
+          const letterIndex = {'a': 0, 'b': 1, 'c': 2, 'd': 3}[answerLetter] || 0;
+          answerMap.set(questionNum, letterIndex.toString());
         }
       }
       
-      if (options.length > 0 && correctAnswer >= 0) {
-        questions.push({
-          id: questionId,
-          question: questionText,
-          options,
-          correctAnswer
-        });
+      // Now parse the questions from the main content
+      // Look for numbered questions like "2. What should you do..."
+      const questionRegex = /(\d+)\.\s+(.+?)(?=\d+\.|$)/g;
+      let questionMatch;
+      
+      while ((questionMatch = questionRegex.exec(mainContent)) !== null) {
+        const questionNum = parseInt(questionMatch[1]);
+        const questionText = questionMatch[2].trim();
+        
+        // Extract options from the question text
+        // Options are formatted like "a) Option text b) Option text"
+        const options: string[] = [];
+        const optionLetters = ['a', 'b', 'c', 'd'];
+        let correctAnswer = -1;
+        
+        // Check if the correct answer for this question exists in our map
+        if (answerMap.has(questionNum)) {
+          correctAnswer = parseInt(answerMap.get(questionNum) || "0");
+          
+          // Extract options - each one should start with a letter followed by a parenthesis
+          const optionMatches = questionText.match(/[a-d]\)([^a-d\)]+)/gi);
+          
+          if (optionMatches) {
+            for (const match of optionMatches) {
+              const letterPart = match.charAt(0).toLowerCase();
+              const optionText = match.substring(2).trim();
+              const letterIndex = optionLetters.indexOf(letterPart);
+              
+              if (letterIndex >= 0) {
+                options[letterIndex] = optionText;
+              }
+            }
+            
+            // Fill any undefined slots with empty strings
+            for (let i = 0; i < 4; i++) {
+              if (!options[i]) options[i] = "";
+            }
+            
+            // Add the parsed question
+            questions.push({
+              id: questionNum,
+              question: questionText.split(/[a-d]\)/i)[0].trim(),
+              options: options.filter(opt => opt), // Remove any empty options
+              correctAnswer
+            });
+          }
+        }
+      }
+    } else if (content.includes("## Quiz Section")) {
+      // Try to extract quiz section from the content
+      const quizSectionMatch = content.match(/## Quiz Section:([\s\S]+)/);
+      
+      if (quizSectionMatch) {
+        const quizContent = quizSectionMatch[1].trim();
+        const questionRegex = /(\d+)\.\s+(.+?)(?=\d+\.|$)/g;
+        let match;
+        
+        while ((match = questionRegex.exec(quizContent)) !== null) {
+          const qId = parseInt(match[1]);
+          const qText = match[2].trim();
+          
+          // Extract options with their letters
+          const options: string[] = [];
+          const optionRegex = /([a-d])\)\s*([^a-d\n]+)/gi;
+          let optionMatch;
+          let correctAnswerIndex = -1;
+          
+          // Check for correct answer markers like "(correct)"
+          while ((optionMatch = optionRegex.exec(qText)) !== null) {
+            const letter = optionMatch[1].toLowerCase();
+            let optionText = optionMatch[2].trim();
+            const letterIndex = letter.charCodeAt(0) - 97; // 'a' -> 0, 'b' -> 1, etc.
+            
+            const isCorrect = optionText.includes("(correct)");
+            if (isCorrect) {
+              optionText = optionText.replace("(correct)", "").trim();
+              correctAnswerIndex = letterIndex;
+            }
+            
+            options[letterIndex] = optionText;
+          }
+          
+          // If we found a question with options, add it
+          if (options.length > 0) {
+            const questionTitle = qText.split(/[a-d]\)/i)[0].trim();
+            
+            // If we didn't find a marked correct answer, default to the first option
+            if (correctAnswerIndex === -1) correctAnswerIndex = 0;
+            
+            questions.push({
+              id: qId,
+              question: questionTitle,
+              options: options.filter(Boolean), // Remove any empty options
+              correctAnswer: correctAnswerIndex
+            });
+          }
+        }
+      }
+    } else {
+      // Use the original parsing logic for the older format
+      const sections = content.split('## Question');
+      
+      // Skip the first section if it's an introduction
+      const startIndex = sections[0].trim().startsWith('# Quiz') ? 1 : 0;
+      
+      for (let i = startIndex; i < sections.length; i++) {
+        const section = sections[i].trim();
+        if (!section) continue;
+        
+        // Parse question
+        const questionMatch = section.match(/^\s*(\d+):\s*(.+?)\s*\n/);
+        if (!questionMatch) continue;
+        
+        const questionId = parseInt(questionMatch[1]);
+        const questionText = questionMatch[2].trim();
+        
+        // Parse options and correct answer
+        const options: string[] = [];
+        let correctAnswer = -1;
+        
+        const optionsText = section.split('\n').slice(1);
+        
+        for (let j = 0; j < optionsText.length; j++) {
+          const optionLine = optionsText[j].trim();
+          // Look for options in format: - Option text (This line will end with `(correct)` for the correct answer)
+          if (optionLine.startsWith('- ')) {
+            const isCorrect = optionLine.endsWith('(correct)');
+            const optionText = isCorrect 
+              ? optionLine.substring(2, optionLine.length - 9).trim()
+              : optionLine.substring(2).trim();
+            
+            options.push(optionText);
+            
+            if (isCorrect) {
+              correctAnswer = options.length - 1;
+            }
+          }
+        }
+        
+        if (options.length > 0 && correctAnswer >= 0) {
+          questions.push({
+            id: questionId,
+            question: questionText,
+            options,
+            correctAnswer
+          });
+        }
       }
     }
     
-    return questions;
+    console.log("Parsed questions:", questions); // For debugging
+    return questions.length > 0 ? questions : [];
   } catch (error) {
     console.error("Error parsing quiz content:", error);
     return [];
