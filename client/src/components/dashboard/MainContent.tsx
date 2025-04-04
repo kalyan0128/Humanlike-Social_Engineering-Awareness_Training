@@ -89,10 +89,20 @@ const MainContent = ({ activeSection }: MainContentProps) => {
   const [_, setLocation] = useLocation();
   
   // Fetch dashboard data
-  const { data, isLoading, error } = useQuery<DashboardData>({
+  const { data, isLoading, error, refetch } = useQuery<DashboardData>({
     queryKey: ["/api/dashboard"],
-    queryFn: fetchDashboardData
+    queryFn: fetchDashboardData,
+    refetchOnMount: true,
+    refetchOnWindowFocus: true,
+    staleTime: 0 // Override the default to ensure fresh data
   });
+  
+  // Force refetch when active section changes to "progress"
+  useEffect(() => {
+    if (activeSection === "progress") {
+      refetch();
+    }
+  }, [activeSection, refetch]);
   
   // Handle errors
   useEffect(() => {

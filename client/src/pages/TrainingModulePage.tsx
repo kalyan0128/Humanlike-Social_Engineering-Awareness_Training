@@ -686,9 +686,12 @@ export default function TrainingModulePage() {
                       score: score
                     });
                     
-                    // Invalidate the dashboard query to force a refresh
+                    // Invalidate all related queries to force a refresh when returning to dashboard
                     queryClient.invalidateQueries({ queryKey: ["/api/dashboard"] });
                     queryClient.invalidateQueries({ queryKey: ["/api/user"] });
+                    
+                    // Also manually invalidate any other queries that might be needed
+                    queryClient.invalidateQueries({ queryKey: ["/api/training-modules"] });
                     
                     toast({
                       title: "Quiz Completed!",
@@ -733,9 +736,12 @@ export default function TrainingModulePage() {
                         score: null
                       });
                       
-                      // Invalidate the dashboard query to force a refresh
+                      // Invalidate all related queries to force a refresh when returning to dashboard
                       queryClient.invalidateQueries({ queryKey: ["/api/dashboard"] });
                       queryClient.invalidateQueries({ queryKey: ["/api/user"] });
+                      
+                      // Also manually invalidate any other queries that might be needed
+                      queryClient.invalidateQueries({ queryKey: ["/api/training-modules"] });
                       
                       toast({
                         title: "Module Completed!",

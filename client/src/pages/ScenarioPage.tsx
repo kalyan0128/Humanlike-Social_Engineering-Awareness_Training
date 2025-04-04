@@ -46,10 +46,13 @@ export default function ScenarioPage() {
   const [_, setLocation] = useLocation();
   const scenarioId = params.id;
 
-  // Fetch scenario data
+  // Fetch scenario data with optimized query configuration
   const { data: scenario, isLoading, error } = useQuery<ThreatScenario>({
-    queryKey: [`/api/threat-scenarios/${scenarioId}`],
-    queryFn: () => fetchScenario(scenarioId)
+    queryKey: ['/api/threat-scenarios', scenarioId], // Use array format for better cache invalidation
+    queryFn: () => fetchScenario(scenarioId),
+    refetchOnMount: true,
+    refetchOnWindowFocus: true,
+    staleTime: 0 // Override the default to ensure fresh data
   });
 
   // Handle errors

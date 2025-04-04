@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { useLocation, Link, useParams } from "wouter";
 import { toast } from "@/hooks/use-toast";
-import { apiRequest } from "@/lib/queryClient";
+import { apiRequest, queryClient } from "@/lib/queryClient";
 import { OrganizationPolicy } from "@shared/schema";
 import { ArrowLeft, FileText, Bookmark, Info } from "lucide-react";
 import ReactMarkdown from 'react-markdown';
@@ -46,10 +46,13 @@ export default function PolicyPage() {
   const [_, setLocation] = useLocation();
   const policyId = params.id;
 
-  // Fetch policy data
+  // Fetch policy data with optimized query configuration
   const { data: policy, isLoading, error } = useQuery<OrganizationPolicy>({
-    queryKey: [`/api/organization-policies/${policyId}`],
-    queryFn: () => fetchPolicy(policyId)
+    queryKey: ['/api/organization-policies', policyId], // Use array format for better cache invalidation
+    queryFn: () => fetchPolicy(policyId),
+    refetchOnMount: true,
+    refetchOnWindowFocus: true,
+    staleTime: 0 // Override the default to ensure fresh data
   });
 
   // Handle errors
@@ -192,6 +195,11 @@ export default function PolicyPage() {
                         acknowledged: true
                       })
                     });
+                    
+                    // Invalidate all related queries to ensure dashboard shows updated data
+                    queryClient.invalidateQueries({ queryKey: ["/api/dashboard"] });
+                    queryClient.invalidateQueries({ queryKey: ["/api/user"] });
+                    queryClient.invalidateQueries({ queryKey: ["/api/organization-policies"] });
                     
                     toast({
                       title: "Policy Acknowledged",
