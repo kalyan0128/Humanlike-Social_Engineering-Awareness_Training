@@ -65,6 +65,47 @@ const parseQuizContent = (content: string): QuizQuestion[] => {
       ];
     }
     
+    // Social Engineering quiz
+    if (content.includes("Social Engineering Fundamentals")) {
+      console.log("Found Social Engineering quiz content, using hardcoded questions");
+      
+      return [
+        {
+          id: 1,
+          question: "What is the primary focus of social engineering attacks?",
+          options: [
+            "Exploiting software vulnerabilities",
+            "Manipulating people",
+            "Network penetration",
+            "Password cracking"
+          ],
+          correctAnswer: 1 // b) Manipulating people
+        },
+        {
+          id: 2,
+          question: "Which human trait do social engineers most commonly exploit?",
+          options: [
+            "Intelligence",
+            "Technical knowledge",
+            "Trust",
+            "Physical strength"
+          ],
+          correctAnswer: 2 // c) Trust
+        },
+        {
+          id: 3,
+          question: "Which of the following is NOT a common social engineering technique?",
+          options: [
+            "Pretexting",
+            "Baiting",
+            "Cryptography",
+            "Phishing"
+          ],
+          correctAnswer: 2 // c) Cryptography
+        }
+      ];
+    }
+    
     // General parsing logic for different formats
     const questions: QuizQuestion[] = [];
     
