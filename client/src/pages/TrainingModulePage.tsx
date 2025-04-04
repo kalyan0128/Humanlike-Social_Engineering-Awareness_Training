@@ -531,6 +531,19 @@ interface TrainingModulePageParams {
   id: string;
 }
 
+// Format content to remove quiz section from display
+const formatModuleContent = (content: string): string => {
+  if (!content) return '';
+  
+  // Remove Quiz Section from the displayed content
+  if (content.includes('## Quiz Section:')) {
+    const parts = content.split('## Quiz Section:');
+    return parts[0].trim();
+  }
+  
+  return content;
+};
+
 // Function to fetch training module data
 async function fetchTrainingModule(id: string): Promise<TrainingModule> {
   try {
@@ -653,7 +666,7 @@ export default function TrainingModulePage() {
           
           <div className="prose prose-neutral max-w-none">
             <ReactMarkdown>
-              {module.content || "Content not available for this training module."}
+              {formatModuleContent(module.content || "Content not available for this training module.")}
             </ReactMarkdown>
           </div>
           
