@@ -22,7 +22,12 @@ const ThreatScenarios = ({ threats, className = "" }: ThreatScenariosProps) => {
         <div className="flex justify-between items-center mb-4">
           <h2 className="text-lg font-semibold">Latest Threat Scenarios</h2>
           <button 
-            onClick={() => setLocation('/dashboard#scenarios')}
+            onClick={(e) => {
+              e.preventDefault();
+              // Navigate to dashboard and set active section to scenarios
+              window.localStorage.setItem('dashboardActiveSection', 'scenarios');
+              setLocation('/dashboard');
+            }}
             className="text-primary hover:text-primary-dark text-sm font-semibold"
           >
             View All

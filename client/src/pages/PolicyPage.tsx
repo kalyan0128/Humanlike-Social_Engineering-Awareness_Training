@@ -175,12 +175,43 @@ export default function PolicyPage() {
           <div className="mt-12 pt-6 border-t">
             <div className="flex flex-col md:flex-row md:justify-between gap-4">
               <button 
-                onClick={() => {
-                  toast({
-                    title: "Policy Acknowledged",
-                    description: "Thank you for reviewing this organization policy.",
-                    variant: "default",
-                  });
+                onClick={async () => {
+                  try {
+                    const token = localStorage.getItem('token');
+                    if (!token) throw new Error("Authentication required");
+                    
+                    // Record acknowledgment in user progress
+                    await fetch('/api/acknowledge-policy', {
+                      method: 'POST',
+                      headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${token}`
+                      },
+                      body: JSON.stringify({
+                        policyId: policy.id,
+                        acknowledged: true
+                      })
+                    });
+                    
+                    toast({
+                      title: "Policy Acknowledged",
+                      description: "Thank you for reviewing this organization policy.",
+                      variant: "default",
+                    });
+                    
+                    // Navigate back to dashboard after short delay
+                    setTimeout(() => {
+                      window.localStorage.setItem('dashboardActiveSection', 'progress');
+                      setLocation('/dashboard');
+                    }, 1500);
+                  } catch (error) {
+                    console.error("Failed to acknowledge policy:", error);
+                    toast({
+                      title: "Error",
+                      description: "Failed to record your acknowledgment. Please try again.",
+                      variant: "destructive",
+                    });
+                  }
                 }}
                 className="border border-primary text-primary hover:bg-primary hover:text-white px-4 py-2 rounded-md flex items-center justify-center"
               >

@@ -20,7 +20,12 @@ const OrgPolicies = ({ policies }: OrgPoliciesProps) => {
         <div className="flex justify-between items-center mb-4">
           <h2 className="text-lg font-semibold">Organization Policies</h2>
           <button 
-            onClick={() => setLocation('/dashboard#policies')}
+            onClick={(e) => {
+              e.preventDefault();
+              // Navigate to dashboard and set active section to policies
+              window.localStorage.setItem('dashboardActiveSection', 'policies');
+              setLocation('/dashboard');
+            }}
             className="text-primary hover:text-primary-dark text-sm font-semibold"
           >
             View All
@@ -49,7 +54,12 @@ const OrgPolicies = ({ policies }: OrgPoliciesProps) => {
             <Button 
               variant="link"
               className="w-full py-2 text-center text-primary hover:text-primary-dark font-semibold text-sm"
-              onClick={() => setLocation('/dashboard#policies')}
+              onClick={(e) => {
+                e.preventDefault();
+                // Navigate to dashboard and set active section to policies
+                window.localStorage.setItem('dashboardActiveSection', 'policies');
+                setLocation('/dashboard');
+              }}
             >
               Show More
             </Button>
