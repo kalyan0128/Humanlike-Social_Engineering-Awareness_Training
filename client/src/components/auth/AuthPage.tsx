@@ -27,7 +27,7 @@ const AuthPage = ({ initialView = "login" }: AuthPageProps) => {
       </div>
       
       <div className="mt-8 text-center text-neutral-600 text-sm">
-        <p>&copy; {new Date().getFullYear()} Gannon University. All rights reserved.</p>
+        <p>&copy; {new Date().getFullYear()} Gannon University.</p>
       </div>
     </div>
   );
