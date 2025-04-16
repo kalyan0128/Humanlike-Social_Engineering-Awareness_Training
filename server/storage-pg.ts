@@ -33,6 +33,7 @@ export interface IStorage {
   getTrainingModules(): Promise<TrainingModule[]>;
   getTrainingModule(id: number): Promise<TrainingModule | undefined>;
   getNextRecommendedModules(userId: number, limit?: number): Promise<TrainingModule[]>;
+  addTrainingModule(module: InsertTrainingModule): Promise<TrainingModule>;
   
   // User progress operations
   getUserProgress(userId: number): Promise<UserProgress[]>;
@@ -581,23 +582,25 @@ export class DatabaseStorage implements IStorage {
     const completedModuleIds = completedUserProgress.map(p => p.moduleId);
     
     // Get modules that the user hasn't completed yet
-    let moduleQuery = db
+    let query = db
       .select()
       .from(trainingModules)
       .orderBy(asc(trainingModules.order));
     
+    // Safer way to handle the NOT IN clause with array parameters
     if (completedModuleIds.length > 0) {
-      moduleQuery = moduleQuery.where(
-        not(sql`${trainingModules.id} IN (${completedModuleIds.join(',')})`)
-      );
+      const modules = await query;
+      const filteredModules = modules.filter(
+        module => !completedModuleIds.includes(module.id)
+      ).slice(0, limit);
+      console.log("Recommended modules (filtered):", filteredModules);
+      return filteredModules;
     }
     
-    // Limit results if needed
-    if (limit) {
-      moduleQuery = moduleQuery.limit(limit);
-    }
-    
-    return await moduleQuery;
+    // If no completed modules, just limit the result
+    const modules = await query.limit(limit);
+    console.log("Recommended modules (all):", modules);
+    return modules;
   }
   
   async getUserProgress(userId: number): Promise<UserProgress[]> {

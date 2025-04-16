@@ -392,6 +392,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       
       // Get next recommended modules - increased limit to show new cryptography and MITM modules
       const recommendedModules = await storage.getNextRecommendedModules(userId, 4);
+      console.log("Recommended modules:", recommendedModules);
       
       // Get latest threat scenarios
       const latestThreats = await storage.getThreatScenarios(2);
