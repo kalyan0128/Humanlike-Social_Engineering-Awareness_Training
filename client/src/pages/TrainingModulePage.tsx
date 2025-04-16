@@ -31,7 +31,7 @@ const parseQuizContent = (content: string): QuizQuestion[] => {
       // Check if this is our expected JSON structure with questions array
       if (jsonContent && Array.isArray(jsonContent.questions)) {
         console.log("Successfully parsed JSON quiz content");
-        return jsonContent.questions.map(q => ({
+        return jsonContent.questions.map((q: { id: number; question: string; options: string[]; correctAnswer: number }) => ({
           id: q.id,
           question: q.question,
           options: q.options,
@@ -319,6 +319,16 @@ const QuizSection = ({ module, onComplete }: QuizSectionProps) => {
   const [isSubmitted, setIsSubmitted] = useState(false);
   const [showExplanation, setShowExplanation] = useState<number[]>([]);
   
+  // Try to get introduction from JSON content
+  const getIntroduction = () => {
+    try {
+      const jsonContent = JSON.parse(module.content || "{}");
+      return jsonContent.introduction || "";
+    } catch (error) {
+      return "";
+    }
+  };
+  
   const handleAnswerChange = (questionIndex: number, value: string) => {
     if (isSubmitted) return; // Don't allow changes after submission
     
@@ -398,6 +408,13 @@ const QuizSection = ({ module, onComplete }: QuizSectionProps) => {
   return (
     <div>
       <h2 className="text-xl font-semibold mb-4">Quiz</h2>
+      
+      {getIntroduction() && (
+        <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-6">
+          <p className="text-neutral-700">{getIntroduction()}</p>
+        </div>
+      )}
+      
       <p className="text-neutral-600 mb-6">
         Answer all questions to complete this training module. You need 70% to pass.
       </p>
