@@ -22,6 +22,7 @@ export interface IStorage {
   getTrainingModules(): Promise<TrainingModule[]>;
   getTrainingModule(id: number): Promise<TrainingModule | undefined>;
   getNextRecommendedModules(userId: number, limit?: number): Promise<TrainingModule[]>;
+  addTrainingModule(module: InsertTrainingModule): Promise<TrainingModule>;
   
   // User progress operations
   getUserProgress(userId: number): Promise<UserProgress[]>;
@@ -2410,7 +2411,7 @@ The following security controls will be enforced through MDM:
   }
 
   // Helper methods for sample data
-  private async addTrainingModule(module: InsertTrainingModule): Promise<TrainingModule> {
+  async addTrainingModule(module: InsertTrainingModule): Promise<TrainingModule> {
     const id = this.currentTrainingModuleId++;
     const trainingModule: TrainingModule = {
       ...module,
