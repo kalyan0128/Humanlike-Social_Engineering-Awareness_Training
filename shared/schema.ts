@@ -58,6 +58,7 @@ export const organizationPolicies = pgTable("organization_policies", {
   description: text("description").notNull(),
   content: text("content").notNull(),
   category: text("category").notNull(),
+  icon: text("icon"),
   createdAt: timestamp("created_at").defaultNow().notNull(),
 });
 

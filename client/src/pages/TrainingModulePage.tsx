@@ -23,6 +23,26 @@ const parseQuizContent = (content: string): QuizQuestion[] => {
   try {
     console.log("Quiz content:", content); // Help with debugging
     
+    // Check if content is JSON format (our new format)
+    try {
+      // Try to parse as JSON first (for the new modules)
+      const jsonContent = JSON.parse(content);
+      
+      // Check if this is our expected JSON structure with questions array
+      if (jsonContent && Array.isArray(jsonContent.questions)) {
+        console.log("Successfully parsed JSON quiz content");
+        return jsonContent.questions.map(q => ({
+          id: q.id,
+          question: q.question,
+          options: q.options,
+          correctAnswer: q.correctAnswer
+        }));
+      }
+    } catch (jsonError) {
+      // Not JSON, continue with other parsing methods
+      console.log("Content is not valid JSON, trying other parsing methods");
+    }
+    
     // Create some sample questions for testing if the content contains the expected text
     if (content.includes("What should you do if you receive a suspicious email")) {
       console.log("Found phishing quiz content, using hardcoded questions");
