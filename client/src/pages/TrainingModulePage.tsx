@@ -409,11 +409,7 @@ const QuizSection = ({ module, onComplete }: QuizSectionProps) => {
     <div>
       <h2 className="text-xl font-semibold mb-4">Quiz</h2>
       
-      {getIntroduction() && (
-        <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-6">
-          <p className="text-neutral-700">{getIntroduction()}</p>
-        </div>
-      )}
+      {/* Introduction is now displayed in the main module content */}
       
       <p className="text-neutral-600 mb-6">
         Answer all questions to complete this training module. You need 70% to pass.
@@ -571,6 +567,16 @@ interface TrainingModulePageParams {
 // Format content to remove quiz section from display
 const formatModuleContent = (content: string): string => {
   if (!content) return '';
+  
+  // Check if content is JSON format
+  try {
+    const jsonContent = JSON.parse(content);
+    if (jsonContent && jsonContent.introduction) {
+      return jsonContent.introduction;
+    }
+  } catch (error) {
+    // Not JSON, continue with other formatting
+  }
   
   // Remove Quiz Section from the displayed content
   if (content.includes('## Quiz Section:')) {
