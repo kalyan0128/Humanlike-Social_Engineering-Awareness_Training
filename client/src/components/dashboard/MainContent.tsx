@@ -5,7 +5,6 @@ import { DashboardData } from "@/lib/auth";
 import ProgressSummary from "./ProgressSummary";
 import ThreatScenarios from "./ThreatScenarios";
 import OrgPolicies from "./OrgPolicies";
-import SearchBar from "./SearchBar";
 import { useLocation } from "wouter";
 import { apiRequest } from "@/lib/queryClient";
 
@@ -139,36 +138,29 @@ const MainContent = ({ activeSection }: MainContentProps) => {
   return (
     <main className="flex-1 bg-neutral-100 overflow-y-auto">
       <div className="p-6">
-        <div className="flex flex-col space-y-4 mb-6">
-          <div className="flex justify-between items-center">
-            <h1 className="text-2xl font-bold text-neutral-800">
-              {activeSection === "overview" && "Dashboard Overview"}
-              {activeSection === "training" && "Training Modules"}
-              {activeSection === "scenarios" && "Threat Scenarios"}
-              {activeSection === "policies" && "Organization Policies"}
-              {activeSection === "progress" && "My Progress"}
-              {activeSection === "settings" && "Settings"}
-            </h1>
-            <div className="flex space-x-2">
-              <button className="bg-white p-2 rounded-full shadow-sm hover:bg-neutral-200 transition duration-150">
-                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-neutral-600">
-                  <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"></path>
-                  <path d="M13.73 21a2 2 0 0 1-3.46 0"></path>
-                </svg>
-              </button>
-              <button className="bg-white p-2 rounded-full shadow-sm hover:bg-neutral-200 transition duration-150">
-                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-neutral-600">
-                  <circle cx="12" cy="12" r="10"></circle>
-                  <path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"></path>
-                  <line x1="12" y1="17" x2="12.01" y2="17"></line>
-                </svg>
-              </button>
-            </div>
-          </div>
-          
-          {/* Search Bar */}
-          <div className="w-full">
-            <SearchBar />
+        <div className="flex justify-between items-center mb-6">
+          <h1 className="text-2xl font-bold text-neutral-800">
+            {activeSection === "overview" && "Dashboard Overview"}
+            {activeSection === "training" && "Training Modules"}
+            {activeSection === "scenarios" && "Threat Scenarios"}
+            {activeSection === "policies" && "Organization Policies"}
+            {activeSection === "progress" && "My Progress"}
+            {activeSection === "settings" && "Settings"}
+          </h1>
+          <div className="flex space-x-2">
+            <button className="bg-white p-2 rounded-full shadow-sm hover:bg-neutral-200 transition duration-150">
+              <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-neutral-600">
+                <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"></path>
+                <path d="M13.73 21a2 2 0 0 1-3.46 0"></path>
+              </svg>
+            </button>
+            <button className="bg-white p-2 rounded-full shadow-sm hover:bg-neutral-200 transition duration-150">
+              <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-neutral-600">
+                <circle cx="12" cy="12" r="10"></circle>
+                <path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"></path>
+                <line x1="12" y1="17" x2="12.01" y2="17"></line>
+              </svg>
+            </button>
           </div>
         </div>
         
