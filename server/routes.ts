@@ -390,8 +390,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const totalModules = (await storage.getTrainingModules()).length;
       const progressPercentage = totalModules > 0 ? Math.round((completedModules / totalModules) * 100) : 0;
       
-      // Get next recommended modules
-      const recommendedModules = await storage.getNextRecommendedModules(userId, 2);
+      // Get next recommended modules - increased limit to show new cryptography and MITM modules
+      const recommendedModules = await storage.getNextRecommendedModules(userId, 4);
       
       // Get latest threat scenarios
       const latestThreats = await storage.getThreatScenarios(2);
