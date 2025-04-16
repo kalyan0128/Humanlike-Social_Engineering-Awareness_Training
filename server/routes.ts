@@ -1,6 +1,8 @@
 import type { Express, Request, Response } from "express";
 import { createServer, type Server } from "http";
 import { storage } from "./storage";
+// For PostgreSQL, uncomment this line and comment the line above
+// import { storage } from "./storage-pg";
 import jwt from "jsonwebtoken";
 import bcrypt from "bcryptjs";
 import { 

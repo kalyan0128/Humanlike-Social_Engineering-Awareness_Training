@@ -1,6 +1,18 @@
 import express, { type Request, Response, NextFunction } from "express";
 import { registerRoutes } from "./routes";
 import { setupVite, serveStatic, log } from "./vite";
+import { drizzle } from "drizzle-orm/neon-serverless";
+import { Pool, neonConfig } from '@neondatabase/serverless';
+import ws from 'ws';
+import * as schema from "@shared/schema";
+
+// Configure neon to use websockets
+neonConfig.webSocketConstructor = ws;
+
+// Initialize the database connection pool if DATABASE_URL is available
+if (process.env.DATABASE_URL) {
+  console.log("PostgreSQL database URL found. Using PostgreSQL for storage.");
+}
 
 const app = express();
 app.use(express.json());
