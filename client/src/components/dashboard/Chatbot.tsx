@@ -19,6 +19,7 @@ const Chatbot = () => {
   const queryClient = useQueryClient();
   const [isOpen, setIsOpen] = useState(false);
   const [message, setMessage] = useState("");
+  const [localMessages, setLocalMessages] = useState<ChatMessage[]>([]);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   
   // Custom fetch function for chat messages using apiRequest helper
@@ -51,6 +52,14 @@ const Chatbot = () => {
     retry: 1
   });
   
+  // Sync server messages to local state
+  useEffect(() => {
+    if (messages && messages.length > 0) {
+      console.log("Chat messages from server:", messages);
+      setLocalMessages(messages);
+    }
+  }, [messages]);
+  
   // Send message mutation using apiRequest helper
   const sendMessageMutation = useMutation({
     mutationFn: async (message: string) => {
@@ -71,8 +80,13 @@ const Chatbot = () => {
         throw error;
       }
     },
-    onSuccess: () => {
-      // Invalidate the chat messages query to refetch
+    onSuccess: (data) => {
+      console.log("Message sent successfully:", data);
+      
+      // Add the bot response to local messages immediately
+      setLocalMessages(prev => [...prev, data]);
+      
+      // Invalidate the chat messages query to refetch (background sync)
       queryClient.invalidateQueries({ queryKey: ["/api/chat-messages"] });
     },
     onError: (error) => {
@@ -89,12 +103,26 @@ const Chatbot = () => {
     if (messagesEndRef.current) {
       messagesEndRef.current.scrollIntoView({ behavior: "smooth" });
     }
-  }, [messages]);
+  }, [messages, localMessages]);
   
   const handleSendMessage = (e: React.FormEvent) => {
     e.preventDefault();
     
     if (message.trim()) {
+      // Add user message to local state immediately for instant feedback
+      const timestamp = new Date().toISOString();
+      const tempId = Date.now(); // Temporary ID for the local message
+      
+      const userMessage: ChatMessage = {
+        id: tempId,
+        content: message,
+        isBot: false,
+        timestamp
+      };
+      
+      setLocalMessages(prev => [...prev, userMessage]);
+      
+      // Send to server
       sendMessageMutation.mutate(message);
       setMessage("");
     }
@@ -134,12 +162,12 @@ const Chatbot = () => {
           </div>
           
           <ScrollArea className="h-80 p-3 bg-neutral-50">
-            {isLoading ? (
+            {isLoading && localMessages.length === 0 ? (
               <div className="flex items-center justify-center h-full">
                 <div className="animate-spin rounded-full h-6 w-6 border-t-2 border-b-2 border-primary"></div>
               </div>
-            ) : messages && messages.length > 0 ? (
-              messages.map((msg) => (
+            ) : localMessages.length > 0 ? (
+              localMessages.map((msg) => (
                 <div key={msg.id} className="mb-3">
                   {msg.isBot ? (
                     <div className="flex items-start">
