@@ -73,6 +73,59 @@ const mockLLMResponse = async (message: string): Promise<string> => {
 
 export async function registerRoutes(app: Express): Promise<Server> {
   const httpServer = createServer(app);
+  
+  // Search endpoint
+  app.get("/api/search", authenticate, async (req, res) => {
+    try {
+      const type = req.query.type as string;
+      const query = req.query.q as string;
+      
+      if (!query || query.trim().length < 2) {
+        return res.json([]);
+      }
+      
+      const lowercaseQuery = query.toLowerCase();
+      
+      let results: any[] = [];
+      
+      // Search based on the type
+      if (!type || type === 'module') {
+        const modules = await storage.getTrainingModules();
+        const matchedModules = modules.filter(module => 
+          module.title.toLowerCase().includes(lowercaseQuery) || 
+          module.description.toLowerCase().includes(lowercaseQuery)
+        );
+        results = [...results, ...matchedModules];
+      }
+      
+      if (!type || type === 'scenario') {
+        const scenarios = await storage.getThreatScenarios();
+        const matchedScenarios = scenarios.filter(scenario => 
+          scenario.title.toLowerCase().includes(lowercaseQuery) || 
+          scenario.description.toLowerCase().includes(lowercaseQuery)
+        );
+        results = [...results, ...matchedScenarios];
+      }
+      
+      if (!type || type === 'policy') {
+        const policies = await storage.getOrganizationPolicies();
+        const matchedPolicies = policies.filter(policy => 
+          policy.title.toLowerCase().includes(lowercaseQuery) || 
+          policy.description.toLowerCase().includes(lowercaseQuery) ||
+          policy.category.toLowerCase().includes(lowercaseQuery)
+        );
+        results = [...results, ...matchedPolicies];
+      }
+      
+      // Limit results to prevent overwhelming response
+      results = results.slice(0, 10);
+      
+      res.json(results);
+    } catch (error) {
+      console.error("Search error:", error);
+      res.status(500).json({ message: "Error performing search" });
+    }
+  });
 
   // API routes
   app.post("/api/auth/signup", async (req, res) => {
