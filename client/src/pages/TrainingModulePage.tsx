@@ -572,8 +572,8 @@ const formatModuleContent = (content: string): string => {
   try {
     const jsonContent = JSON.parse(content);
     if (jsonContent && jsonContent.introduction) {
-      // For phishing or social engineering quiz, provide a more comprehensive introduction
-      if (content.includes("Phishing attacks")) {
+      // For different types of quizzes, provide more comprehensive introductions
+      if (content.includes("Phishing attacks") || jsonContent.introduction?.includes("Phishing")) {
         return `
 # Understanding Phishing Attacks
 
@@ -609,6 +609,56 @@ Be vigilant for these warning signs:
 - Use multi-factor authentication when available
 - Keep your software and security systems updated
 - When in doubt, contact the organization directly using official contact information
+
+${jsonContent.introduction}
+        `;
+      } else if (content.includes("Password") || jsonContent.introduction?.includes("Password")) {
+        return `
+# Password Security Best Practices
+
+Strong password practices are a fundamental aspect of cybersecurity. Despite the rise of additional authentication methods, passwords remain the primary defense for most accounts and systems.
+
+## Why Password Security Matters
+
+Passwords protect our most sensitive information and assets:
+- Personal accounts (email, banking, healthcare)
+- Work resources and confidential data
+- System and network access points
+- Financial information and transactions
+
+Weak passwords are one of the leading causes of successful cyber attacks, with billions of credentials compromised each year through data breaches and password-cracking techniques.
+
+## Password Creation Guidelines
+
+### Strong Password Characteristics:
+- Length: At least 12 characters (longer is better)
+- Complexity: Mix of uppercase and lowercase letters, numbers, and special characters
+- Uniqueness: Different for each account or service
+- Unpredictability: Avoid obvious patterns, sequences, or personal information
+
+### Avoid These Common Mistakes:
+- Using simple dictionary words
+- Including personal information (names, birthdates)
+- Utilizing predictable patterns (123456, qwerty)
+- Reusing passwords across multiple accounts
+- Making minimal changes to existing passwords (password1, password2)
+
+## Password Management Strategies
+
+### Use a Password Manager
+- Generates and stores complex, unique passwords
+- Requires remembering only one master password
+- Offers additional security features like breach monitoring
+
+### Implement Multi-Factor Authentication (MFA)
+- Adds an additional verification layer beyond your password
+- Significantly reduces the risk of unauthorized access
+- Options include authentication apps, security keys, or biometrics
+
+### Regular Password Maintenance
+- Change passwords periodically (every 3-6 months)
+- Update immediately after a known breach
+- Check for compromised passwords using tools like Have I Been Pwned
 
 ${jsonContent.introduction}
         `;
@@ -652,6 +702,55 @@ Using phone calls to trick victims into revealing sensitive information
 - Report suspicious activity to your security team immediately
 - Remember that legitimate organizations won't ask for sensitive information through unsolicited communications
 - When in doubt, verify through official channels using contact information you've independently obtained
+
+${jsonContent.introduction}
+        `;
+      }
+      // For general cybersecurity awareness modules
+      if (content.includes("Cybersecurity") || jsonContent.introduction?.includes("awareness") || jsonContent.introduction?.includes("Cybersecurity")) {
+        return `
+# Cybersecurity Awareness Essentials
+
+Cybersecurity awareness is the foundation of a strong security posture. Understanding the threats we face and developing secure habits is critical in today's interconnected digital world.
+
+## The Evolving Threat Landscape
+
+The digital threats we face are constantly evolving:
+- Ransomware attacks are increasingly targeting critical infrastructure
+- Social engineering tactics are becoming more sophisticated and personalized
+- IoT devices create new attack surfaces in homes and workplaces
+- Supply chain attacks compromise trusted software and services
+- State-sponsored actors conduct advanced persistent threats against specific targets
+
+## The Human Factor in Cybersecurity
+
+Despite advanced security technologies, humans remain both the strongest defense and the weakest link:
+- 85% of data breaches involve a human element
+- Well-trained employees can detect and prevent many common attacks
+- Proper security awareness can significantly reduce an organization's risk profile
+
+## Core Security Principles
+
+### Defense in Depth
+Implementing multiple layers of security controls to protect assets, so if one fails, others will still provide protection.
+
+### Principle of Least Privilege
+Providing users and systems with only the minimum access rights needed to perform their tasks.
+
+### Regular Updates and Patching
+Keeping systems and applications updated to address known vulnerabilities.
+
+### Data Classification and Protection
+Identifying sensitive information and applying appropriate safeguards based on its value and sensitivity.
+
+## Developing a Security Mindset
+
+A security mindset involves:
+- Questioning unusual requests and communications
+- Verifying identities before sharing sensitive information
+- Being cautious about what information you share online
+- Reporting suspicious activities promptly
+- Understanding that security is everyone's responsibility
 
 ${jsonContent.introduction}
         `;
