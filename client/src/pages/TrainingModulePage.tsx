@@ -949,55 +949,70 @@ export default function TrainingModulePage() {
           {/* Mark as complete button (for non-quiz modules) */}
           {module.type !== 'quiz' && (
             <div className="mt-12 border-t pt-6">
-              <button 
-                onClick={() => {
-                  // Update user progress via API
-                  const updateProgress = async () => {
-                    try {
-                      const token = localStorage.getItem('token');
-                      if (!token) throw new Error("Authentication required");
-                      
-                      await apiRequest('POST', '/api/user-progress', {
-                        moduleId: module.id,
-                        completed: true,
-                        score: null
-                      });
-                      
-                      // Invalidate all related queries to force a refresh when returning to dashboard
-                      queryClient.invalidateQueries({ queryKey: ["/api/dashboard"] });
-                      queryClient.invalidateQueries({ queryKey: ["/api/user"] });
-                      
-                      // Also manually invalidate any other queries that might be needed
-                      queryClient.invalidateQueries({ queryKey: ["/api/training-modules"] });
-                      
-                      toast({
-                        title: "Module Completed!",
-                        description: `You've earned ${module.xpReward} XP for completing this module.`,
-                        variant: "default",
-                      });
-                      
-                      // Navigate back to dashboard after slight delay
-                      setTimeout(() => {
-                        window.localStorage.setItem('dashboardActiveSection', 'progress');
-                        setLocation('/dashboard');
-                      }, 1500);
-                    } catch (error) {
-                      console.error("Failed to update progress", error);
-                      toast({
-                        title: "Error",
-                        description: "Failed to update your progress. Please try again.",
-                        variant: "destructive",
-                      });
-                    }
-                  };
-                  
-                  updateProgress();
-                }}
-                className="bg-primary text-white px-6 py-3 rounded-md flex items-center justify-center w-full md:w-auto"
-              >
-                <CheckCircle className="h-5 w-5 mr-2" />
-                <span>Mark as Complete</span>
-              </button>
+              <div className="flex flex-col md:flex-row gap-4">
+                <button 
+                  onClick={() => {
+                    // Update user progress via API
+                    const updateProgress = async () => {
+                      try {
+                        const token = localStorage.getItem('token');
+                        if (!token) throw new Error("Authentication required");
+                        
+                        await apiRequest('POST', '/api/user-progress', {
+                          moduleId: module.id,
+                          completed: true,
+                          score: null
+                        });
+                        
+                        // Invalidate all related queries to force a refresh when returning to dashboard
+                        queryClient.invalidateQueries({ queryKey: ["/api/dashboard"] });
+                        queryClient.invalidateQueries({ queryKey: ["/api/user"] });
+                        
+                        // Also manually invalidate any other queries that might be needed
+                        queryClient.invalidateQueries({ queryKey: ["/api/training-modules"] });
+                        
+                        toast({
+                          title: "Module Completed!",
+                          description: `You've earned ${module.xpReward} XP for completing this module.`,
+                          variant: "default",
+                        });
+                        
+                        // Navigate back to dashboard after slight delay
+                        setTimeout(() => {
+                          window.localStorage.setItem('dashboardActiveSection', 'progress');
+                          setLocation('/dashboard');
+                        }, 1500);
+                      } catch (error) {
+                        console.error("Failed to update progress", error);
+                        toast({
+                          title: "Error",
+                          description: "Failed to update your progress. Please try again.",
+                          variant: "destructive",
+                        });
+                      }
+                    };
+                    
+                    updateProgress();
+                  }}
+                  className="bg-primary text-white px-6 py-3 rounded-md flex items-center justify-center w-full md:w-auto"
+                >
+                  <CheckCircle className="h-5 w-5 mr-2" />
+                  <span>Mark as Complete</span>
+                </button>
+                
+                {/* Show Quiz button if this is the Password Security module */}
+                {module.title.includes("Password Security Best Practices") && (
+                  <button 
+                    onClick={() => {
+                      setLocation('/training-module/4'); // Navigate to the Password Security Quiz module
+                    }}
+                    className="bg-blue-600 text-white px-6 py-3 rounded-md flex items-center justify-center w-full md:w-auto"
+                  >
+                    <HelpCircle className="h-5 w-5 mr-2" />
+                    <span>Take the Password Security Quiz</span>
+                  </button>
+                )}
+              </div>
             </div>
           )}
         </div>
