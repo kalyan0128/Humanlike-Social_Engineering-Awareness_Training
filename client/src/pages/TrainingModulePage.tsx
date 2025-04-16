@@ -572,6 +572,91 @@ const formatModuleContent = (content: string): string => {
   try {
     const jsonContent = JSON.parse(content);
     if (jsonContent && jsonContent.introduction) {
+      // For phishing or social engineering quiz, provide a more comprehensive introduction
+      if (content.includes("Phishing attacks")) {
+        return `
+# Understanding Phishing Attacks
+
+Phishing attacks are among the most common and dangerous cyber threats facing individuals and organizations today. These attacks attempt to steal your personal information by disguising malicious content as trustworthy entities.
+
+## How Phishing Works
+
+Attackers typically create fraudulent emails, messages, or websites that appear to come from legitimate sources such as:
+- Banks and financial institutions
+- Well-known companies (Amazon, Microsoft, Google)
+- Government agencies
+- Technical support services
+- Social media platforms
+
+These messages often use urgent language, threatening consequences, or tempting offers to manipulate victims into taking immediate action before carefully considering the legitimacy of the request.
+
+## Common Indicators of Phishing
+
+Be vigilant for these warning signs:
+- Urgent requests demanding immediate action
+- Unexpected attachments or links
+- Misspelled domain names or email addresses
+- Generic greetings instead of personalized ones
+- Poor grammar or spelling
+- Requests for sensitive information
+- Offers that seem too good to be true
+
+## Protecting Yourself
+
+- Verify the sender by checking the full email address
+- Don't click on suspicious links - hover over them first to see the destination
+- Never provide sensitive information in response to an unsolicited message
+- Use multi-factor authentication when available
+- Keep your software and security systems updated
+- When in doubt, contact the organization directly using official contact information
+
+${jsonContent.introduction}
+        `;
+      } else if (content.includes("Social Engineering")) {
+        return `
+# Understanding Social Engineering
+
+Social engineering is a broad set of psychological manipulation techniques used by attackers to trick people into making security mistakes or giving away sensitive information. Unlike technical hacking approaches, social engineering exploits human psychology rather than software vulnerabilities.
+
+## The Psychology Behind Social Engineering
+
+Social engineers exploit fundamental human tendencies:
+- Trust and desire to be helpful
+- Fear and urgency to act quickly
+- Curiosity about unusual or interesting offers
+- Respect for authority figures
+- Desire for free items or special deals
+
+## Common Social Engineering Techniques
+
+### Pretexting
+Creating a fabricated scenario to extract information (e.g., impersonating IT support, HR, or executives)
+
+### Baiting
+Offering something enticing to swap for information or access (e.g., free USB drives loaded with malware)
+
+### Quid Pro Quo
+Promising a service or benefit in exchange for information (e.g., offering free tech support for login credentials)
+
+### Tailgating
+Gaining unauthorized physical access by following someone with legitimate access
+
+### Vishing (Voice Phishing)
+Using phone calls to trick victims into revealing sensitive information
+
+## Defending Against Social Engineering
+
+- Verify the identity of anyone requesting sensitive information
+- Be skeptical of unsolicited contact - even if they appear to be from within your organization
+- Never provide credentials, personal information, or access in response to pressure tactics
+- Report suspicious activity to your security team immediately
+- Remember that legitimate organizations won't ask for sensitive information through unsolicited communications
+- When in doubt, verify through official channels using contact information you've independently obtained
+
+${jsonContent.introduction}
+        `;
+      }
+      
       return jsonContent.introduction;
     }
   } catch (error) {
