@@ -1004,7 +1004,152 @@ export default function TrainingModulePage() {
                 {module.title.includes("Password Security Best Practices") && (
                   <button 
                     onClick={() => {
-                      setLocation('/training-module/4'); // Navigate to the Password Security Quiz module
+                      // Instead of navigating to another module, we'll append a quiz to this module
+                      // Create a quiz on password security
+                      const passwordQuiz = {
+                        questions: [
+                          {
+                            id: 1,
+                            question: "What is the minimum recommended length for a strong password?",
+                            options: [
+                              "8 characters",
+                              "10 characters",
+                              "12 characters",
+                              "16 characters"
+                            ],
+                            correctAnswer: 2,
+                            explanation: "Most security experts recommend a minimum of 12 characters for adequate password security. Longer passwords are more resistant to brute force attacks."
+                          },
+                          {
+                            id: 2,
+                            question: "Which of the following is the MOST secure password?",
+                            options: [
+                              "Password123!",
+                              "Tr0ub4dor&3",
+                              "correcthorsebatterystaple",
+                              "P@$$w0rd2023"
+                            ],
+                            correctAnswer: 2,
+                            explanation: "While it may seem counter-intuitive, a longer passphrase like 'correcthorsebatterystaple' is more secure than shorter complex passwords. The length provides more entropy despite using only lowercase letters."
+                          },
+                          {
+                            id: 3,
+                            question: "How often should you change your passwords for critical accounts?",
+                            options: [
+                              "Every month",
+                              "Every 3-6 months",
+                              "Once a year",
+                              "Only when there's a security breach"
+                            ],
+                            correctAnswer: 1,
+                            explanation: "Security experts generally recommend changing passwords for critical accounts every 3-6 months. However, you should always change them immediately following any security breach."
+                          },
+                          {
+                            id: 4,
+                            question: "Which of the following is the BEST way to manage multiple passwords?",
+                            options: [
+                              "Use the same password for all accounts",
+                              "Write down passwords in a notebook",
+                              "Use a trusted password manager",
+                              "Create a pattern you can remember for different sites"
+                            ],
+                            correctAnswer: 2,
+                            explanation: "A trusted password manager is the most secure solution for managing multiple unique and complex passwords. It can generate, store, and auto-fill passwords while only requiring you to remember one master password."
+                          },
+                          {
+                            id: 5,
+                            question: "Which of the following is NOT a sign that your password may have been compromised?",
+                            options: [
+                              "Unexpected account activity",
+                              "Failed login attempts notifications",
+                              "Regular password expiration notices",
+                              "Password reset emails you didn't request"
+                            ],
+                            correctAnswer: 2,
+                            explanation: "Regular password expiration notices are normal security procedures implemented by many services. The other options are potential indicators of compromise that should prompt immediate action."
+                          }
+                        ]
+                      };
+                      
+                      // Create a temporary quiz element
+                      const quizContainer = document.createElement('div');
+                      quizContainer.id = 'password-security-quiz';
+                      quizContainer.className = 'mt-8 pt-8 border-t';
+                      document.querySelector('.prose')?.parentElement?.appendChild(quizContainer);
+                      
+                      // Display the quiz heading
+                      const quizHeading = document.createElement('h2');
+                      quizHeading.className = 'text-xl font-bold text-neutral-800 mb-4';
+                      quizHeading.textContent = 'Password Security Quiz';
+                      quizContainer.appendChild(quizHeading);
+                      
+                      // Display the quiz introduction
+                      const quizIntro = document.createElement('p');
+                      quizIntro.className = 'text-neutral-600 mb-6';
+                      quizIntro.textContent = 'Test your knowledge of password security best practices with this quiz.';
+                      quizContainer.appendChild(quizIntro);
+                      
+                      // Hide the buttons section
+                      const buttonsContainer = document.querySelector('.mt-12.border-t.pt-6');
+                      if (buttonsContainer) {
+                        buttonsContainer.classList.add('hidden');
+                      }
+                      
+                      // Create and display quiz questions (simplified version)
+                      passwordQuiz.questions.forEach((q, index) => {
+                        const questionEl = document.createElement('div');
+                        questionEl.className = 'mb-8 p-6 bg-gray-50 rounded-lg';
+                        
+                        const questionText = document.createElement('h3');
+                        questionText.className = 'font-medium text-lg mb-4';
+                        questionText.textContent = `${index + 1}. ${q.question}`;
+                        questionEl.appendChild(questionText);
+                        
+                        q.options.forEach((option, optionIndex) => {
+                          const optionContainer = document.createElement('div');
+                          optionContainer.className = 'flex items-center space-x-2 mb-2 p-2 hover:bg-gray-100 rounded';
+                          
+                          const radio = document.createElement('input');
+                          radio.type = 'radio';
+                          radio.name = `question-${q.id}`;
+                          radio.value = optionIndex.toString();
+                          radio.id = `q${q.id}-option${optionIndex}`;
+                          radio.className = 'text-primary';
+                          
+                          const label = document.createElement('label');
+                          label.htmlFor = `q${q.id}-option${optionIndex}`;
+                          label.className = 'ml-2 text-sm font-medium text-gray-900';
+                          label.textContent = option;
+                          
+                          optionContainer.appendChild(radio);
+                          optionContainer.appendChild(label);
+                          questionEl.appendChild(optionContainer);
+                        });
+                        
+                        quizContainer.appendChild(questionEl);
+                      });
+                      
+                      // Add submit button
+                      const submitBtn = document.createElement('button');
+                      submitBtn.className = 'bg-primary text-white px-6 py-3 rounded-md flex items-center justify-center';
+                      submitBtn.innerHTML = '<span>Submit Quiz</span>';
+                      submitBtn.onclick = () => {
+                        toast({
+                          title: "Quiz Submitted!",
+                          description: "You've earned 30 XP for completing this quiz.",
+                          variant: "default",
+                        });
+                        
+                        // Return to dashboard after delay
+                        setTimeout(() => {
+                          window.localStorage.setItem('dashboardActiveSection', 'progress');
+                          setLocation('/dashboard');
+                        }, 1500);
+                      };
+                      quizContainer.appendChild(submitBtn);
+                      
+                      // Scroll to quiz
+                      document.getElementById('password-security-quiz')?.scrollIntoView({ behavior: 'smooth' });
                     }}
                     className="bg-blue-600 text-white px-6 py-3 rounded-md flex items-center justify-center w-full md:w-auto"
                   >
