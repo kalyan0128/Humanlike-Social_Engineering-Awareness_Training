@@ -15,6 +15,8 @@ interface ProgressSummaryProps {
     id: number;
     title: string;
     description: string;
+    type?: string;
+    difficulty?: string;
   }[];
   achievements?: {
     id: number;
@@ -128,7 +130,16 @@ const ProgressSummary = ({ progress, recommendedModules, achievements }: Progres
                   className="border border-neutral-200 rounded-md p-3 hover:bg-neutral-50 cursor-pointer transition duration-150 flex justify-between items-center"
                 >
                   <div>
-                    <h4 className="font-medium">{module.title}</h4>
+                    <div className="flex items-center gap-2">
+                      <h4 className="font-medium">{module.title}</h4>
+                      {module.type && (
+                        <span className={`text-xs px-2 py-0.5 rounded-full ${
+                          module.type === 'quiz' ? 'bg-amber-100 text-amber-800' : 'bg-blue-100 text-blue-800'
+                        }`}>
+                          {module.type === 'quiz' ? 'Quiz' : 'Article'}
+                        </span>
+                      )}
+                    </div>
                     <p className="text-sm text-neutral-600">{module.description}</p>
                   </div>
                   <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-primary">
