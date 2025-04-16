@@ -482,7 +482,7 @@ export class DatabaseStorage implements IStorage {
   }
   
   // Helper methods to add entities to database
-  private async addTrainingModule(module: InsertTrainingModule): Promise<TrainingModule> {
+  async addTrainingModule(module: InsertTrainingModule): Promise<TrainingModule> {
     const [trainingModule] = await db
       .insert(trainingModules)
       .values(module)
