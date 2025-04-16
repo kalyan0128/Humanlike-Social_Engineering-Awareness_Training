@@ -1,8 +1,11 @@
 import type { Express, Request, Response } from "express";
 import { createServer, type Server } from "http";
-import { storage } from "./storage";
-// For PostgreSQL, uncomment this line and comment the line above
-// import { storage } from "./storage-pg";
+// import { storage } from "./storage";
+// Using PostgreSQL database instead of in-memory storage
+import { storage } from "./storage-pg";
+
+// Fix TypeScript type issues
+type AnyParam = any; // We need this for type safety in some event handlers
 import jwt from "jsonwebtoken";
 import bcrypt from "bcryptjs";
 import { 
