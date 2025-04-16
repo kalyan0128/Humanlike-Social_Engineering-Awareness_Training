@@ -1099,15 +1099,26 @@ export default function TrainingModulePage() {
                       passwordQuiz.questions.forEach((q, index) => {
                         const questionEl = document.createElement('div');
                         questionEl.className = 'mb-8 p-6 bg-gray-50 rounded-lg';
+                        questionEl.id = `question-container-${q.id}`;
                         
                         const questionText = document.createElement('h3');
                         questionText.className = 'font-medium text-lg mb-4';
                         questionText.textContent = `${index + 1}. ${q.question}`;
                         questionEl.appendChild(questionText);
                         
+                        // Hidden explanation div that will be shown after submission
+                        const explanationEl = document.createElement('div');
+                        explanationEl.className = 'mt-4 p-4 border-l-4 border-primary bg-blue-50 hidden';
+                        explanationEl.id = `explanation-${q.id}`;
+                        explanationEl.innerHTML = `
+                          <div class="font-medium">Correct Answer: ${q.options[q.correctAnswer]}</div>
+                          <div class="text-sm mt-1">${q.explanation}</div>
+                        `;
+                        
                         q.options.forEach((option, optionIndex) => {
                           const optionContainer = document.createElement('div');
                           optionContainer.className = 'flex items-center space-x-2 mb-2 p-2 hover:bg-gray-100 rounded';
+                          optionContainer.id = `option-${q.id}-${optionIndex}`;
                           
                           const radio = document.createElement('input');
                           radio.type = 'radio';
@@ -1126,6 +1137,7 @@ export default function TrainingModulePage() {
                           questionEl.appendChild(optionContainer);
                         });
                         
+                        questionEl.appendChild(explanationEl);
                         quizContainer.appendChild(questionEl);
                       });
                       
@@ -1134,17 +1146,69 @@ export default function TrainingModulePage() {
                       submitBtn.className = 'bg-primary text-white px-6 py-3 rounded-md flex items-center justify-center';
                       submitBtn.innerHTML = '<span>Submit Quiz</span>';
                       submitBtn.onclick = () => {
-                        toast({
-                          title: "Quiz Submitted!",
-                          description: "You've earned 30 XP for completing this quiz.",
-                          variant: "default",
+                        // Calculate score
+                        let score = 0;
+                        let totalQuestions = passwordQuiz.questions.length;
+                        let answeredQuestions = 0;
+                        
+                        // Process each question
+                        passwordQuiz.questions.forEach(q => {
+                          const selectedOption = document.querySelector(`input[name="question-${q.id}"]:checked`);
+                          if (selectedOption) {
+                            answeredQuestions++;
+                            const selectedValue = parseInt(selectedOption.value);
+                            
+                            // Mark correct/incorrect
+                            if (selectedValue === q.correctAnswer) {
+                              score++;
+                              document.getElementById(`option-${q.id}-${selectedValue}`)?.classList.add('bg-green-100', 'border', 'border-green-500', 'rounded');
+                            } else {
+                              document.getElementById(`option-${q.id}-${selectedValue}`)?.classList.add('bg-red-100', 'border', 'border-red-500', 'rounded');
+                              document.getElementById(`option-${q.id}-${q.correctAnswer}`)?.classList.add('bg-green-100', 'border', 'border-green-500', 'rounded');
+                            }
+                            
+                            // Show explanation
+                            document.getElementById(`explanation-${q.id}`)?.classList.remove('hidden');
+                          }
                         });
                         
-                        // Return to dashboard after delay
-                        setTimeout(() => {
-                          window.localStorage.setItem('dashboardActiveSection', 'progress');
-                          setLocation('/dashboard');
-                        }, 1500);
+                        // Disable all radios
+                        document.querySelectorAll('#password-security-quiz input[type="radio"]').forEach(radio => {
+                          (radio as HTMLInputElement).disabled = true;
+                        });
+                        
+                        // Hide submit button
+                        submitBtn.classList.add('hidden');
+                        
+                        // Add score information
+                        const scoreInfo = document.createElement('div');
+                        scoreInfo.className = 'mt-6 p-4 bg-blue-100 rounded-lg text-center';
+                        scoreInfo.innerHTML = `
+                          <h3 class="font-bold text-lg mb-2">Quiz Results</h3>
+                          <p class="mb-4">You scored ${score} out of ${totalQuestions} (${Math.round((score/totalQuestions)*100)}%)</p>
+                          <button id="completeBtn" class="bg-green-600 text-white px-6 py-2 rounded-md">
+                            Complete and Return to Dashboard
+                          </button>
+                        `;
+                        quizContainer.appendChild(scoreInfo);
+                        
+                        // Add event listener to complete button
+                        document.getElementById('completeBtn')?.addEventListener('click', () => {
+                          toast({
+                            title: "Quiz Completed!",
+                            description: `You've earned 30 XP for completing this quiz.`,
+                            variant: "default",
+                          });
+                          
+                          // Return to dashboard after delay
+                          setTimeout(() => {
+                            window.localStorage.setItem('dashboardActiveSection', 'progress');
+                            setLocation('/dashboard');
+                          }, 1500);
+                        });
+                        
+                        // Scroll to top of quiz
+                        document.getElementById('password-security-quiz')?.scrollIntoView({ behavior: 'smooth' });
                       };
                       quizContainer.appendChild(submitBtn);
                       
