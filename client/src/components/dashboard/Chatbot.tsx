@@ -70,39 +70,17 @@ const Chatbot = () => {
     }
   }, [messages, localMessages.length]);
   
-  // Simple function to send a message and handle bot response
+  // Send message and handle both user message and bot response
   const sendMessageMutation = useMutation({
     mutationFn: async (userMessageText: string) => {
       if (!localStorage.getItem('token')) {
         throw new Error("Authentication required");
       }
       
-      // First create user message in local state
-      const userMessage: ChatMessage = {
-        id: Date.now(),
-        content: userMessageText,
-        isBot: false,
-        timestamp: new Date().toISOString()
-      };
-      
-      // Add the user message to local state
-      setLocalMessages(prev => [...prev, userMessage]);
-      
       try {
-        // Send the message to the server and get AI response
+        // Send the message to the server - API now returns both user message and bot response
         const response = await apiRequest("POST", "/api/chat", { message: userMessageText });
-        const botResponse = await response.json();
-        
-        // Now create bot message
-        const botMessage: ChatMessage = {
-          id: Date.now() + 1, // ensure unique ID
-          content: botResponse.content,
-          isBot: true,
-          timestamp: new Date().toISOString()
-        };
-        
-        // Return the bot message
-        return botMessage;
+        return await response.json();
       } catch (error) {
         if (error instanceof Error && error.message.includes("401")) {
           localStorage.removeItem('token');
@@ -113,13 +91,20 @@ const Chatbot = () => {
         throw error;
       }
     },
-    onSuccess: (botMessage) => {
-      console.log("Message sent successfully, bot response:", botMessage);
+    onSuccess: (data) => {
+      console.log("Chat API response:", data);
       
-      // Add the bot response to local state
-      setLocalMessages(prev => [...prev, botMessage]);
+      // Update local messages with the conversation array from the response
+      // This includes both the user message and bot response
+      if (data.conversation && Array.isArray(data.conversation) && data.conversation.length === 2) {
+        const userMsg = data.conversation[0];
+        const botMsg = data.conversation[1];
+        
+        // Add both messages to the local state
+        setLocalMessages(prev => [...prev, userMsg, botMsg]);
+      }
       
-      // Fetch messages in background to keep in sync with server (but don't replace local state)
+      // Invalidate query to keep background sync
       queryClient.invalidateQueries({ queryKey: ["/api/chat-messages"] });
     },
     onError: (error) => {

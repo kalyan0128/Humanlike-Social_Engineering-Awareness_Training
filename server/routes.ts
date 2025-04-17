@@ -629,7 +629,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const { message } = chatMessageSchema.parse(req.body);
       
       // Store user message
-      await storage.createChatMessage({
+      const userMessage = await storage.createChatMessage({
         userId,
         content: message,
         isBot: false
@@ -652,7 +652,12 @@ export async function registerRoutes(app: Express): Promise<Server> {
         isBot: true
       });
       
-      res.json(storedBotResponse);
+      // Return both the user message and bot response in one object
+      res.json({
+        userMessage,
+        botResponse: storedBotResponse,
+        conversation: [userMessage, storedBotResponse]
+      });
     } catch (error) {
       if (error instanceof ZodError) {
         const formattedError = fromZodError(error);
