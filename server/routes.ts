@@ -431,8 +431,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
       // Get latest threat scenarios
       const latestThreats = await storage.getThreatScenarios(2);
       
-      // Get organization policies
-      const policies = await storage.getOrganizationPolicies(3);
+      // Get organization policies - increased limit to show all policies
+      const policies = await storage.getOrganizationPolicies(10);
       
       // Get user achievements
       const userAchievementIds = (await storage.getUserAchievements(userId)).map(ua => ua.achievementId);
