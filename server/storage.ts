@@ -36,6 +36,7 @@ export interface IStorage {
   // Organization policy operations
   getOrganizationPolicies(limit?: number): Promise<OrganizationPolicy[]>;
   getOrganizationPolicy(id: number): Promise<OrganizationPolicy | undefined>;
+  addOrganizationPolicy(policy: InsertOrganizationPolicy): Promise<OrganizationPolicy>;
   
   // Chat message operations
   getChatMessages(userId: number, limit?: number): Promise<ChatMessage[]>;
@@ -2597,6 +2598,20 @@ The following security controls will be enforced through MDM:
   
   async getOrganizationPolicy(id: number): Promise<OrganizationPolicy | undefined> {
     return this.organizationPolicies.get(id);
+  }
+  
+  async addOrganizationPolicy(policy: InsertOrganizationPolicy): Promise<OrganizationPolicy> {
+    const id = this.currentOrganizationPolicyId++;
+    const timestamp = new Date();
+    
+    const newPolicy: OrganizationPolicy = {
+      id,
+      ...policy,
+      createdAt: timestamp
+    };
+    
+    this.organizationPolicies.set(id, newPolicy);
+    return newPolicy;
   }
 
   // Chat message operations

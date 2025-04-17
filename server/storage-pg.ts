@@ -499,7 +499,7 @@ export class DatabaseStorage implements IStorage {
     return threatScenario;
   }
   
-  private async addOrganizationPolicy(policy: InsertOrganizationPolicy): Promise<OrganizationPolicy> {
+  async addOrganizationPolicy(policy: InsertOrganizationPolicy): Promise<OrganizationPolicy> {
     const [organizationPolicy] = await db
       .insert(organizationPolicies)
       .values(policy)
