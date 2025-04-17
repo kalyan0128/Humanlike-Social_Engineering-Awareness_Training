@@ -32,6 +32,7 @@ export interface IStorage {
   // Threat scenario operations
   getThreatScenarios(limit?: number): Promise<ThreatScenario[]>;
   getThreatScenario(id: number): Promise<ThreatScenario | undefined>;
+  addThreatScenario(scenario: InsertThreatScenario): Promise<ThreatScenario>;
   
   // Organization policy operations
   getOrganizationPolicies(limit?: number): Promise<OrganizationPolicy[]>;
@@ -2586,6 +2587,20 @@ The following security controls will be enforced through MDM:
   
   async getThreatScenario(id: number): Promise<ThreatScenario | undefined> {
     return this.threatScenarios.get(id);
+  }
+  
+  async addThreatScenario(scenario: InsertThreatScenario): Promise<ThreatScenario> {
+    const id = this.currentThreatScenarioId++;
+    const timestamp = new Date();
+    
+    const threatScenario: ThreatScenario = {
+      id,
+      ...scenario,
+      createdAt: timestamp
+    };
+    
+    this.threatScenarios.set(id, threatScenario);
+    return threatScenario;
   }
 
   // Organization policy operations

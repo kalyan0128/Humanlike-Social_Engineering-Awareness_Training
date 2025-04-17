@@ -77,6 +77,50 @@ const mockLLMResponse = async (message: string): Promise<string> => {
 };
 
 export async function registerRoutes(app: Express): Promise<Server> {
+  // Route to add new threat scenarios
+  app.post('/api/admin/add-threat-scenarios', async (req, res) => {
+    try {
+      // Add first scenario - Deepfake Fraud
+      const scenario1 = await storage.addThreatScenario({
+        title: "Deepfake Fraud",
+        description: "Increasingly realistic AI-generated media is enabling sophisticated impersonation attacks.",
+        content: "# Deepfake Fraud: The Growing Threat of AI-Powered Impersonation\n\nDeepfakes are synthetic media created using artificial intelligence that can superimpose faces, manipulate voices, or generate entirely fabricated content that appears remarkably genuine.\n\nAs this technology becomes more accessible, social engineers are weaponizing deepfakes for various fraudulent activities including executive impersonation, biometric authentication bypass, and relationship manipulation.\n\nDetection techniques include watching for visual inconsistencies, audio discrepancies, contextual analysis, and implementing verification protocols for high-risk requests.\n\nProtection strategies include using multi-factor authentication, establishing communication protocols for financial transactions, conducting awareness training, and creating authentication code words for sensitive communications.",
+        severity: "critical",
+        isNew: true,
+        isTrending: true,
+        category: "ai-threats"
+      });
+
+      // Add second scenario - Supply Chain Attacks
+      const scenario2 = await storage.addThreatScenario({
+        title: "Supply Chain Attacks",
+        description: "Targeting the less-secure elements in a supply chain to compromise the ultimate target.",
+        content: "# Supply Chain Attacks: Exploiting the Weakest Links\n\nSupply chain attacks target organizations by exploiting vulnerabilities in their vendor networks rather than attacking well-defended targets directly.\n\nThese attacks follow a pattern: reconnaissance of vendors, vulnerability analysis to find the weakest link, initial compromise of the supplier, establishing persistence, pivoting to the ultimate target, and finally exploitation.\n\nCommon vectors include software supply chain attacks (like SolarWinds), hardware supply chain attacks (malicious components), and third-party service provider compromises.\n\nDefense strategies include vendor risk management (due diligence, monitoring, contractual requirements), software security practices (verifying downloads, controlled deployment), and operational security measures (network segmentation, verification protocols for unusual requests).",
+        severity: "high",
+        isNew: true,
+        isTrending: false,
+        category: "network-threats"
+      });
+
+      // Add third scenario - Business Email Compromise
+      const scenario3 = await storage.addThreatScenario({
+        title: "Business Email Compromise",
+        description: "Sophisticated email scams targeting businesses to conduct unauthorized fund transfers.",
+        content: "# Business Email Compromise: The Billion-Dollar Threat\n\nBusiness Email Compromise (BEC) is a sophisticated scam targeting businesses with social engineering tactics to trick employees into making unauthorized fund transfers or revealing sensitive information.\n\nCommon scenarios include CEO fraud (urgent wire transfer requests), vendor/supplier swindles (modified payment instructions), attorney impersonation (time-sensitive legal matters), and data theft variants targeting sensitive company information.\n\nWarning signs include requests for urgency or secrecy, slight variations in email addresses, grammar inconsistencies, changed payment details, pressure to act quickly, and communication limited to email only.\n\nProtection requires both organizational controls (verification protocols, approval processes, employee training) and individual vigilance (verifying unusual requests through different channels, checking email addresses carefully).",
+        severity: "high",
+        isNew: true,
+        isTrending: true,
+        category: "email-threats"
+      });
+
+      console.log("Added threat scenarios:", [scenario1.id, scenario2.id, scenario3.id]);
+      res.status(201).json({ message: "Threat scenarios added successfully" });
+    } catch (error) {
+      console.error("Error adding threat scenarios:", error);
+      res.status(500).json({ message: "Error adding threat scenarios" });
+    }
+  });
+  
   // Route to add new organization policies
   app.post('/api/admin/add-policies', async (req, res) => {
     try {
