@@ -17,6 +17,7 @@ import {
 import { zodToJsonSchema } from "zod-to-json-schema";
 import { ZodError } from "zod";
 import { fromZodError } from "zod-validation-error";
+import deepseekService from "./services/deepseek";
 
 // JWT secret key (ideally from environment variable)
 const JWT_SECRET = process.env.JWT_SECRET || "humanlike-awarebot-secret-key";
@@ -632,8 +633,15 @@ export async function registerRoutes(app: Express): Promise<Server> {
         isBot: false
       });
       
-      // Generate bot response using DeepSeek R1 LLM (mocked for now)
-      const botResponse = await mockLLMResponse(message);
+      let botResponse = "";
+      try {
+        // Generate bot response using DeepSeek R1 LLM API
+        botResponse = await deepseekService.getCompletion(message);
+      } catch (apiError) {
+        console.error("DeepSeek API error:", apiError);
+        // Fallback to mock response if API fails
+        botResponse = await mockLLMResponse(message);
+      }
       
       // Store bot response
       const storedBotResponse = await storage.createChatMessage({
@@ -648,6 +656,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         const formattedError = fromZodError(error);
         return res.status(400).json({ message: formattedError.message });
       }
+      console.error("Chat message processing error:", error);
       res.status(500).json({ message: "Error processing chat message" });
     }
   });
