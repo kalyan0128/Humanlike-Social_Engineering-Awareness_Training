@@ -11,3 +11,9 @@
     @apply font-sans antialiased bg-background text-foreground;
   }
 }
+
+@layer components {
+  .bg-primary-light {
+    @apply bg-primary/80; /* 80% opacity of primary color */
+  }
+}

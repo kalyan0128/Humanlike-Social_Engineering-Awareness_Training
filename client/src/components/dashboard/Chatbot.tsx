@@ -151,9 +151,10 @@ const Chatbot = () => {
     
     if (message.trim()) {
       // Show user message immediately in UI
+      const userMessageText = message.trim(); // Cache the message text
       const tempUserMessage: ChatMessage = {
         id: Date.now(),
-        content: message,
+        content: userMessageText,
         isBot: false,
         timestamp: new Date().toISOString()
       };
@@ -161,11 +162,11 @@ const Chatbot = () => {
       // Add to local state first for immediate feedback
       setLocalMessages(prevMessages => [...prevMessages, tempUserMessage]);
       
-      // Then send to server
-      sendMessageMutation.mutate(message);
-      
-      // Clear input field
+      // Clear input field immediately for better UX
       setMessage("");
+      
+      // Then send to server
+      sendMessageMutation.mutate(userMessageText);
     }
   };
   
@@ -226,7 +227,7 @@ const Chatbot = () => {
                       </div>
                     ) : (
                       <div className="flex justify-end">
-                        <div className="bg-primary-light text-white rounded-lg p-2 max-w-[85%]">
+                        <div className="bg-blue-600 text-white rounded-lg p-2 max-w-[85%]">
                           <p className="text-sm">{msg.content}</p>
                         </div>
                       </div>
