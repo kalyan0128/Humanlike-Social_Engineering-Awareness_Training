@@ -68,7 +68,11 @@ const Chatbot = () => {
       }
       
       try {
-        const response = await apiRequest("POST", "/api/chat", { message });
+        // First, add the user message to the database
+        await apiRequest("POST", "/api/chat", { message });
+        
+        // Then, wait for the bot response
+        const response = await apiRequest("GET", "/api/chat-messages");
         return await response.json();
       } catch (error) {
         if (error instanceof Error && error.message.includes("401")) {
@@ -83,8 +87,8 @@ const Chatbot = () => {
     onSuccess: (data) => {
       console.log("Message sent successfully:", data);
       
-      // Add the bot response to local messages immediately
-      setLocalMessages(prev => [...prev, data]);
+      // Update local messages with the complete chat history
+      setLocalMessages(data);
       
       // Invalidate the chat messages query to refetch (background sync)
       queryClient.invalidateQueries({ queryKey: ["/api/chat-messages"] });
@@ -229,7 +233,7 @@ const Chatbot = () => {
               </Button>
             </form>
             <div className="text-xs text-neutral-500 mt-1">
-              Powered by DeepSeek R1 LLM
+              Powered by Groq LLM - Llama 3 8B
             </div>
           </div>
         </div>
