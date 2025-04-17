@@ -557,18 +557,19 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
   
-  // Threat scenarios endpoints
-  app.get("/api/threat-scenarios", authenticate, async (req, res) => {
+  // Threat scenarios endpoints - public access
+  app.get("/api/threat-scenarios", async (req, res) => {
     try {
       const limit = req.query.limit ? parseInt(req.query.limit as string) : undefined;
       const scenarios = await storage.getThreatScenarios(limit);
       res.json(scenarios);
     } catch (error) {
+      console.error("Error retrieving threat scenarios:", error);
       res.status(500).json({ message: "Error retrieving threat scenarios" });
     }
   });
   
-  app.get("/api/threat-scenarios/:id", authenticate, async (req, res) => {
+  app.get("/api/threat-scenarios/:id", async (req, res) => {
     try {
       const scenarioId = parseInt(req.params.id);
       const scenario = await storage.getThreatScenario(scenarioId);
@@ -579,6 +580,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       
       res.json(scenario);
     } catch (error) {
+      console.error("Error retrieving threat scenario:", error);
       res.status(500).json({ message: "Error retrieving threat scenario" });
     }
   });

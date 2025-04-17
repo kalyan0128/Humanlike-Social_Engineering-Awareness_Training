@@ -54,11 +54,13 @@ export class DeepSeekR1Service {
 
   constructor(options: DeepSeekR1Options) {
     this.apiKey = options.apiKey;
-    this.baseUrl = options.baseUrl || 'https://api.deepseek.com/v1';
+    this.baseUrl = options.baseUrl || 'https://api-alpha.deepseek.com/v1';
   }
 
   async getCompletion(userMessage: string): Promise<string> {
     try {
+      console.log("Calling DeepSeek API with message:", userMessage.substring(0, 50) + "...");
+      
       const messages: ChatMessage[] = [
         { role: 'system', content: DEFAULT_SYSTEM_PROMPT },
         { role: 'user', content: userMessage }
@@ -80,11 +82,19 @@ export class DeepSeekR1Service {
         }
       );
 
+      // Log successful response
+      console.log("DeepSeek API response successful");
       return response.data.choices[0].message.content;
     } catch (error) {
       console.error('Error calling DeepSeek API:', error);
       if (axios.isAxiosError(error)) {
-        console.error('API Error:', error.response?.data);
+        console.error('API Error details:', error.response?.data);
+        console.error('API Status:', error.response?.status);
+        
+        // If it's an authentication error, log more details to help debugging
+        if (error.response?.status === 401) {
+          console.error('Authentication failed. Please check your DeepSeek API key.');
+        }
       }
       throw new Error('Failed to get response from DeepSeek R1 LLM');
     }
