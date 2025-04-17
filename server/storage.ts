@@ -2429,30 +2429,9 @@ The following security controls will be enforced through MDM:
     return trainingModule;
   }
   
-  private async addThreatScenario(scenario: InsertThreatScenario): Promise<ThreatScenario> {
-    const id = this.currentThreatScenarioId++;
-    const threatScenario: ThreatScenario = {
-      ...scenario,
-      id,
-      createdAt: new Date(),
-      // Ensure required properties have default values if not provided
-      isNew: scenario.isNew !== undefined ? scenario.isNew : false,
-      isTrending: scenario.isTrending !== undefined ? scenario.isTrending : false
-    };
-    this.threatScenarios.set(id, threatScenario);
-    return threatScenario;
-  }
+  // Method moved to public implementation below
   
-  private async addOrganizationPolicy(policy: InsertOrganizationPolicy): Promise<OrganizationPolicy> {
-    const id = this.currentOrganizationPolicyId++;
-    const organizationPolicy: OrganizationPolicy = {
-      ...policy,
-      id,
-      createdAt: new Date()
-    };
-    this.organizationPolicies.set(id, organizationPolicy);
-    return organizationPolicy;
-  }
+  // Method moved to public implementation below
   
   private async addAchievement(achievement: InsertAchievement): Promise<Achievement> {
     const id = this.currentAchievementId++;
@@ -2596,7 +2575,10 @@ The following security controls will be enforced through MDM:
     const threatScenario: ThreatScenario = {
       id,
       ...scenario,
-      createdAt: timestamp
+      createdAt: timestamp,
+      // Ensure required boolean fields have values
+      isNew: scenario.isNew !== undefined ? scenario.isNew : false,
+      isTrending: scenario.isTrending !== undefined ? scenario.isTrending : false
     };
     
     this.threatScenarios.set(id, threatScenario);
