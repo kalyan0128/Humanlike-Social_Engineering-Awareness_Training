@@ -94,14 +94,12 @@ const Chatbot = () => {
     onSuccess: (data) => {
       console.log("Chat API response:", data);
       
-      // Update local messages with the conversation array from the response
-      // This includes both the user message and bot response
-      if (data.conversation && Array.isArray(data.conversation) && data.conversation.length === 2) {
-        const userMsg = data.conversation[0];
-        const botMsg = data.conversation[1];
+      // We already added the user message, so just add the bot response
+      if (data.botResponse) {
+        const botMsg = data.botResponse;
         
-        // Add both messages to the local state
-        setLocalMessages(prev => [...prev, userMsg, botMsg]);
+        // Add bot message to local state
+        setLocalMessages(prev => [...prev, botMsg]);
       }
       
       // Invalidate query to keep background sync
@@ -123,11 +121,47 @@ const Chatbot = () => {
     }
   }, [localMessages]);
   
+  // Create a typing indicator when waiting for bot response
+  const renderTypingIndicator = () => {
+    if (sendMessageMutation.isPending) {
+      return (
+        <div className="flex items-start mb-3">
+          <div className="bg-primary rounded-full h-8 w-8 flex items-center justify-center text-white mr-2 flex-shrink-0">
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3Z"></path>
+              <path d="M19 10v2a7 7 0 0 1-14 0v-2"></path>
+              <line x1="12" x2="12" y1="19" y2="22"></line>
+            </svg>
+          </div>
+          <div className="bg-neutral-200 rounded-lg p-3 max-w-[85%]">
+            <div className="flex space-x-1">
+              <div className="h-2 w-2 bg-gray-500 rounded-full animate-bounce"></div>
+              <div className="h-2 w-2 bg-gray-500 rounded-full animate-bounce" style={{ animationDelay: '0.2s' }}></div>
+              <div className="h-2 w-2 bg-gray-500 rounded-full animate-bounce" style={{ animationDelay: '0.4s' }}></div>
+            </div>
+          </div>
+        </div>
+      );
+    }
+    return null;
+  };
+  
   const handleSendMessage = (e: React.FormEvent) => {
     e.preventDefault();
     
     if (message.trim()) {
-      // Send message to server (user message will be added in the mutation function)
+      // Show user message immediately in UI
+      const tempUserMessage: ChatMessage = {
+        id: Date.now(),
+        content: message,
+        isBot: false,
+        timestamp: new Date().toISOString()
+      };
+      
+      // Add to local state first for immediate feedback
+      setLocalMessages(prevMessages => [...prevMessages, tempUserMessage]);
+      
+      // Then send to server
       sendMessageMutation.mutate(message);
       
       // Clear input field
@@ -174,30 +208,34 @@ const Chatbot = () => {
                 <div className="animate-spin rounded-full h-6 w-6 border-t-2 border-b-2 border-primary"></div>
               </div>
             ) : localMessages.length > 0 ? (
-              localMessages.map((msg) => (
-                <div key={msg.id} className="mb-3">
-                  {msg.isBot ? (
-                    <div className="flex items-start">
-                      <div className="bg-primary rounded-full h-8 w-8 flex items-center justify-center text-white mr-2 flex-shrink-0">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                          <path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3Z"></path>
-                          <path d="M19 10v2a7 7 0 0 1-14 0v-2"></path>
-                          <line x1="12" x2="12" y1="19" y2="22"></line>
-                        </svg>
+              <>
+                {localMessages.map((msg) => (
+                  <div key={msg.id} className="mb-3">
+                    {msg.isBot ? (
+                      <div className="flex items-start">
+                        <div className="bg-primary rounded-full h-8 w-8 flex items-center justify-center text-white mr-2 flex-shrink-0">
+                          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                            <path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3Z"></path>
+                            <path d="M19 10v2a7 7 0 0 1-14 0v-2"></path>
+                            <line x1="12" x2="12" y1="19" y2="22"></line>
+                          </svg>
+                        </div>
+                        <div className="bg-neutral-200 rounded-lg p-2 max-w-[85%]">
+                          <p className="text-sm">{msg.content}</p>
+                        </div>
                       </div>
-                      <div className="bg-neutral-200 rounded-lg p-2 max-w-[85%]">
-                        <p className="text-sm">{msg.content}</p>
+                    ) : (
+                      <div className="flex justify-end">
+                        <div className="bg-primary-light text-white rounded-lg p-2 max-w-[85%]">
+                          <p className="text-sm">{msg.content}</p>
+                        </div>
                       </div>
-                    </div>
-                  ) : (
-                    <div className="flex justify-end">
-                      <div className="bg-primary-light text-white rounded-lg p-2 max-w-[85%]">
-                        <p className="text-sm">{msg.content}</p>
-                      </div>
-                    </div>
-                  )}
-                </div>
-              ))
+                    )}
+                  </div>
+                ))}
+                {/* Show typing indicator while the bot is generating a response */}
+                {renderTypingIndicator()}
+              </>
             ) : (
               <div className="flex items-center justify-center h-full text-center px-4">
                 <div>
