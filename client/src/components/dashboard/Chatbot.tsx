@@ -7,6 +7,16 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 import { toast } from "@/hooks/use-toast";
 import { useLocation } from "wouter";
 
+// Interface for server-side chat messages
+interface ServerChatMessage {
+  id: number;
+  userId: number;
+  content: string;
+  isBot: boolean;
+  timestamp: string;
+}
+
+// Interface for local chat messages (may have temporary IDs)
 interface ChatMessage {
   id: number;
   content: string;
@@ -60,23 +70,39 @@ const Chatbot = () => {
     }
   }, [messages, localMessages.length]);
   
-  // Send message mutation using apiRequest helper
+  // Simple function to send a message and handle bot response
   const sendMessageMutation = useMutation({
     mutationFn: async (userMessageText: string) => {
       if (!localStorage.getItem('token')) {
         throw new Error("Authentication required");
       }
       
+      // First create user message in local state
+      const userMessage: ChatMessage = {
+        id: Date.now(),
+        content: userMessageText,
+        isBot: false,
+        timestamp: new Date().toISOString()
+      };
+      
+      // Add the user message to local state
+      setLocalMessages(prev => [...prev, userMessage]);
+      
       try {
         // Send the message to the server and get AI response
         const response = await apiRequest("POST", "/api/chat", { message: userMessageText });
         const botResponse = await response.json();
         
-        // Return both the user message and the bot response
-        return {
-          userMessage: userMessageText,
-          botResponse: botResponse
+        // Now create bot message
+        const botMessage: ChatMessage = {
+          id: Date.now() + 1, // ensure unique ID
+          content: botResponse.content,
+          isBot: true,
+          timestamp: new Date().toISOString()
         };
+        
+        // Return the bot message
+        return botMessage;
       } catch (error) {
         if (error instanceof Error && error.message.includes("401")) {
           localStorage.removeItem('token');
@@ -87,19 +113,13 @@ const Chatbot = () => {
         throw error;
       }
     },
-    onSuccess: (data) => {
-      console.log("Message sent successfully:", data);
+    onSuccess: (botMessage) => {
+      console.log("Message sent successfully, bot response:", botMessage);
       
-      // We don't need to update the complete message history here
-      // Just add the bot response to the local messages
-      setLocalMessages(prev => [...prev, {
-        id: Date.now(),
-        content: data.botResponse.content,
-        isBot: true,
-        timestamp: new Date().toISOString()
-      }]);
+      // Add the bot response to local state
+      setLocalMessages(prev => [...prev, botMessage]);
       
-      // Fetch messages in background to keep in sync with server
+      // Fetch messages in background to keep in sync with server (but don't replace local state)
       queryClient.invalidateQueries({ queryKey: ["/api/chat-messages"] });
     },
     onError: (error) => {
@@ -122,22 +142,10 @@ const Chatbot = () => {
     e.preventDefault();
     
     if (message.trim()) {
-      // Add user message to local state immediately for instant feedback
-      const timestamp = new Date().toISOString();
-      const tempId = Date.now(); // Temporary ID for the local message
-      
-      const userMessage: ChatMessage = {
-        id: tempId,
-        content: message,
-        isBot: false,
-        timestamp
-      };
-      
-      // Add the user message to the local state
-      setLocalMessages(prev => [...prev, userMessage]);
-      
-      // Send to server to get bot response
+      // Send message to server (user message will be added in the mutation function)
       sendMessageMutation.mutate(message);
+      
+      // Clear input field
       setMessage("");
     }
   };
