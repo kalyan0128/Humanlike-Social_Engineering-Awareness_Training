@@ -52,28 +52,31 @@ const Chatbot = () => {
     retry: 1
   });
   
-  // Sync server messages to local state
+  // Only use server messages on initial load
   useEffect(() => {
-    if (messages && messages.length > 0) {
-      console.log("Chat messages from server:", messages);
+    if (messages && messages.length > 0 && localMessages.length === 0) {
+      console.log("Initial chat messages from server:", messages);
       setLocalMessages(messages);
     }
-  }, [messages]);
+  }, [messages, localMessages.length]);
   
   // Send message mutation using apiRequest helper
   const sendMessageMutation = useMutation({
-    mutationFn: async (message: string) => {
+    mutationFn: async (userMessageText: string) => {
       if (!localStorage.getItem('token')) {
         throw new Error("Authentication required");
       }
       
       try {
-        // First, add the user message to the database
-        await apiRequest("POST", "/api/chat", { message });
+        // Send the message to the server and get AI response
+        const response = await apiRequest("POST", "/api/chat", { message: userMessageText });
+        const botResponse = await response.json();
         
-        // Then, wait for the bot response
-        const response = await apiRequest("GET", "/api/chat-messages");
-        return await response.json();
+        // Return both the user message and the bot response
+        return {
+          userMessage: userMessageText,
+          botResponse: botResponse
+        };
       } catch (error) {
         if (error instanceof Error && error.message.includes("401")) {
           localStorage.removeItem('token');
@@ -87,10 +90,16 @@ const Chatbot = () => {
     onSuccess: (data) => {
       console.log("Message sent successfully:", data);
       
-      // Update local messages with the complete chat history
-      setLocalMessages(data);
+      // We don't need to update the complete message history here
+      // Just add the bot response to the local messages
+      setLocalMessages(prev => [...prev, {
+        id: Date.now(),
+        content: data.botResponse.content,
+        isBot: true,
+        timestamp: new Date().toISOString()
+      }]);
       
-      // Invalidate the chat messages query to refetch (background sync)
+      // Fetch messages in background to keep in sync with server
       queryClient.invalidateQueries({ queryKey: ["/api/chat-messages"] });
     },
     onError: (error) => {
@@ -107,7 +116,7 @@ const Chatbot = () => {
     if (messagesEndRef.current) {
       messagesEndRef.current.scrollIntoView({ behavior: "smooth" });
     }
-  }, [messages, localMessages]);
+  }, [localMessages]);
   
   const handleSendMessage = (e: React.FormEvent) => {
     e.preventDefault();
@@ -124,9 +133,10 @@ const Chatbot = () => {
         timestamp
       };
       
+      // Add the user message to the local state
       setLocalMessages(prev => [...prev, userMessage]);
       
-      // Send to server
+      // Send to server to get bot response
       sendMessageMutation.mutate(message);
       setMessage("");
     }
