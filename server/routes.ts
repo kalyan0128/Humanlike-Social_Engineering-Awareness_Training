@@ -17,7 +17,7 @@ import {
 import { zodToJsonSchema } from "zod-to-json-schema";
 import { ZodError } from "zod";
 import { fromZodError } from "zod-validation-error";
-import deepseekService from "./services/deepseek";
+import groqService from "./services/groq";
 
 // JWT secret key (ideally from environment variable)
 const JWT_SECRET = process.env.JWT_SECRET || "humanlike-awarebot-secret-key";

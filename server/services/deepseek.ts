@@ -54,7 +54,8 @@ export class DeepSeekR1Service {
 
   constructor(options: DeepSeekR1Options) {
     this.apiKey = options.apiKey;
-    this.baseUrl = options.baseUrl || 'https://api-alpha.deepseek.com/v1';
+    // Use the standard DeepSeek API endpoint
+    this.baseUrl = options.baseUrl || 'https://api.deepseek.com/v1';
   }
 
   async getCompletion(userMessage: string): Promise<string> {
