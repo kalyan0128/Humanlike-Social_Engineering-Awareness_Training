@@ -1,13 +1,4 @@
-import { Groq } from 'groq';
-
-interface GroqServiceOptions {
-  apiKey: string;
-}
-
-interface ChatMessage {
-  role: 'system' | 'user' | 'assistant';
-  content: string;
-}
+import axios from 'axios';
 
 const DEFAULT_SYSTEM_PROMPT = `You are HumanLike-AwareBot, an AI assistant specializing in social engineering awareness and cybersecurity education.
 Your primary goal is to help users understand, identify, and protect against social engineering attacks.
@@ -29,44 +20,53 @@ Guidelines for responses:
 
 Remember: Your guidance helps build human-centered security awareness that protects individuals and organizations from social engineering threats.`;
 
-export class GroqService {
-  private apiKey: string;
-  private client: Groq;
-
-  constructor(options: GroqServiceOptions) {
-    this.apiKey = options.apiKey;
-    this.client = new Groq({ apiKey: this.apiKey });
-  }
-
+/**
+ * Service to interact with the Groq API for LLM completions
+ */
+const groqService = {
+  /**
+   * Get a completion from the Groq API
+   * @param userMessage The user's message to generate a completion for
+   * @returns The completion text
+   */
   async getCompletion(userMessage: string): Promise<string> {
     try {
       console.log("Calling Groq API with message:", userMessage.substring(0, 50) + "...");
       
-      const messages: ChatMessage[] = [
+      const messages = [
         { role: 'system', content: DEFAULT_SYSTEM_PROMPT },
         { role: 'user', content: userMessage }
       ];
-
-      const response = await this.client.chat.completions.create({
-        model: 'llama3-8b-8192',  // Using Llama 3 8B model
-        messages: messages,
-        temperature: 0.7,
-        max_tokens: 1000
-      });
+      
+      // Make direct API call to Groq using axios
+      const response = await axios.post(
+        'https://api.groq.com/openai/v1/chat/completions',
+        {
+          model: 'llama3-8b-8192',  // Using Llama 3 8B model
+          messages: messages,
+          temperature: 0.7,
+          max_tokens: 1000
+        },
+        {
+          headers: {
+            'Authorization': `Bearer ${process.env.GROQ_API_KEY}`,
+            'Content-Type': 'application/json'
+          }
+        }
+      );
 
       // Log successful response
       console.log("Groq API response successful");
-      return response.choices[0].message.content || "I apologize, but I couldn't generate a response at this time.";
+      return response.data.choices[0].message.content || "I apologize, but I couldn't generate a response at this time.";
     } catch (error) {
       console.error('Error calling Groq API:', error);
+      if (axios.isAxiosError(error)) {
+        console.error('API Error details:', error.response?.data);
+        console.error('API Status:', error.response?.status);
+      }
       throw new Error('Failed to get response from Groq LLM');
     }
   }
-}
-
-// Create a singleton instance - will be initialized with actual API key in routes.ts
-const groqService = new GroqService({
-  apiKey: process.env.GROQ_API_KEY || '',
-});
+};
 
 export default groqService;

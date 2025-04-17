@@ -637,10 +637,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
       
       let botResponse = "";
       try {
-        // Generate bot response using DeepSeek R1 LLM API
-        botResponse = await deepseekService.getCompletion(message);
+        // Generate bot response using Groq LLM API
+        botResponse = await groqService.getCompletion(message);
       } catch (apiError) {
-        console.error("DeepSeek API error:", apiError);
+        console.error("Groq API error:", apiError);
         // Fallback to mock response if API fails
         botResponse = await mockLLMResponse(message);
       }
