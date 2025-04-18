@@ -99,10 +99,19 @@ export async function registerRoutes(app: Express): Promise<Server> {
         }
       });
       
-      // Log info about duplicates (can't delete them without modifying the storage interface)
+      // Delete the duplicate scenarios
       if (duplicateIds.length > 0) {
         console.log(`Found ${duplicateIds.length} duplicate threat scenarios. IDs: ${duplicateIds.join(', ')}`);
-        console.log("Please remove these duplicates manually from the database.");
+        
+        // Delete each duplicate
+        for (const id of duplicateIds) {
+          try {
+            await storage.deleteThreatScenario(id);
+            console.log(`Successfully deleted duplicate threat scenario ID: ${id}`);
+          } catch (err) {
+            console.error(`Error deleting duplicate threat scenario ID: ${id}`, err);
+          }
+        }
       } else {
         console.log("No duplicate threat scenarios found.");
       }

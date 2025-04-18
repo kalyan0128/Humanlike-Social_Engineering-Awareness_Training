@@ -685,6 +685,12 @@ export class DatabaseStorage implements IStorage {
     return scenario;
   }
   
+  async deleteThreatScenario(id: number): Promise<void> {
+    await db
+      .delete(threatScenarios)
+      .where(eq(threatScenarios.id, id));
+  }
+  
   async getOrganizationPolicies(limit?: number): Promise<OrganizationPolicy[]> {
     let query = db
       .select()

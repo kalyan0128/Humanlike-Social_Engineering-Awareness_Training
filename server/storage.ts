@@ -33,6 +33,7 @@ export interface IStorage {
   getThreatScenarios(limit?: number): Promise<ThreatScenario[]>;
   getThreatScenario(id: number): Promise<ThreatScenario | undefined>;
   addThreatScenario(scenario: InsertThreatScenario): Promise<ThreatScenario>;
+  deleteThreatScenario(id: number): Promise<void>;
   
   // Organization policy operations
   getOrganizationPolicies(limit?: number): Promise<OrganizationPolicy[]>;
@@ -2568,6 +2569,10 @@ The following security controls will be enforced through MDM:
     return this.threatScenarios.get(id);
   }
   
+  async deleteThreatScenario(id: number): Promise<void> {
+    this.threatScenarios.delete(id);
+  }
+  
   async addThreatScenario(scenario: InsertThreatScenario): Promise<ThreatScenario> {
     const id = this.currentThreatScenarioId++;
     const timestamp = new Date();
@@ -2604,7 +2609,8 @@ The following security controls will be enforced through MDM:
     const newPolicy: OrganizationPolicy = {
       id,
       ...policy,
-      createdAt: timestamp
+      createdAt: timestamp,
+      icon: policy.icon || null
     };
     
     this.organizationPolicies.set(id, newPolicy);
