@@ -704,9 +704,329 @@ const MainContent = ({ activeSection }: MainContentProps) => {
         )}
         
         {activeSection === "settings" && (
-          <div className="bg-white rounded-lg shadow-sm p-4">
-            <h2 className="text-lg font-semibold mb-4">Settings</h2>
-            <p className="text-neutral-600">This section will allow you to customize your account settings.</p>
+          <div className="space-y-6">
+            {/* User Profile Settings */}
+            <div className="bg-white rounded-lg shadow-sm p-6">
+              <h2 className="text-lg font-semibold mb-4">User Profile</h2>
+              <div className="flex flex-col md:flex-row gap-6">
+                <div className="md:w-1/3">
+                  <div className="bg-neutral-100 rounded-lg p-6 flex flex-col items-center">
+                    <div className="relative">
+                      <div className="h-24 w-24 rounded-full bg-primary text-white flex items-center justify-center text-3xl font-semibold mb-3">
+                        {data?.userProfile?.firstName?.charAt(0) || 'U'}{data?.userProfile?.lastName?.charAt(0) || 'S'}
+                      </div>
+                      <button className="absolute bottom-0 right-0 bg-white p-2 rounded-full shadow-sm hover:bg-neutral-200 transition duration-150 border border-neutral-200">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                          <path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h7"/>
+                          <line x1="16" y1="5" x2="22" y2="11"/>
+                          <line x1="14" y1="7" x2="14" y2="13"/>
+                          <line x1="8" y1="13" x2="14" y2="13"/>
+                        </svg>
+                      </button>
+                    </div>
+                    <h3 className="font-medium text-lg mt-2 text-center">
+                      {data?.userProfile?.firstName || 'User'} {data?.userProfile?.lastName || ''}
+                    </h3>
+                    <p className="text-neutral-600 text-sm">
+                      Level {data?.userProgress?.currentLevel || 'Beginner'} • {data?.userProgress?.xpPoints || 0} XP
+                    </p>
+                    <div className="mt-4 w-full">
+                      <button className="w-full bg-primary text-white px-4 py-2 rounded flex items-center justify-center text-sm font-medium">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="mr-2">
+                          <path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5L17 3Z"/>
+                        </svg>
+                        Edit Profile
+                      </button>
+                    </div>
+                  </div>
+                </div>
+                
+                <div className="md:w-2/3">
+                  <form className="space-y-4">
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      <div>
+                        <label className="block text-sm font-medium text-neutral-700 mb-1">First Name</label>
+                        <input 
+                          type="text" 
+                          className="w-full p-2 border border-neutral-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent"
+                          placeholder="First Name"
+                          defaultValue={data?.userProfile?.firstName || ''}
+                        />
+                      </div>
+                      <div>
+                        <label className="block text-sm font-medium text-neutral-700 mb-1">Last Name</label>
+                        <input 
+                          type="text" 
+                          className="w-full p-2 border border-neutral-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent"
+                          placeholder="Last Name"
+                          defaultValue={data?.userProfile?.lastName || ''}
+                        />
+                      </div>
+                    </div>
+                    <div>
+                      <label className="block text-sm font-medium text-neutral-700 mb-1">Email Address</label>
+                      <input 
+                        type="email" 
+                        className="w-full p-2 border border-neutral-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent"
+                        placeholder="Email Address"
+                        defaultValue={data?.userProfile?.email || ''}
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-sm font-medium text-neutral-700 mb-1">Bio</label>
+                      <textarea 
+                        className="w-full p-2 border border-neutral-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent"
+                        placeholder="Tell us a bit about yourself"
+                        rows={3}
+                        defaultValue={data?.userProfile?.bio || ''}
+                      />
+                    </div>
+                    <div className="flex justify-end">
+                      <button type="button" className="bg-primary text-white px-4 py-2 rounded text-sm font-medium">
+                        Save Profile
+                      </button>
+                    </div>
+                  </form>
+                </div>
+              </div>
+            </div>
+            
+            {/* Account Settings */}
+            <div className="bg-white rounded-lg shadow-sm p-6">
+              <h2 className="text-lg font-semibold mb-4">Account Security</h2>
+              <div className="space-y-4">
+                <div className="p-4 border border-neutral-200 rounded-lg">
+                  <div className="flex justify-between items-center">
+                    <div>
+                      <h3 className="font-medium">Change Password</h3>
+                      <p className="text-neutral-600 text-sm">Update your password regularly to keep your account secure</p>
+                    </div>
+                    <button className="bg-white border border-neutral-300 hover:bg-neutral-100 text-neutral-800 px-4 py-2 rounded text-sm font-medium transition duration-150">
+                      Change
+                    </button>
+                  </div>
+                </div>
+                
+                <div className="p-4 border border-neutral-200 rounded-lg">
+                  <div className="flex justify-between items-center">
+                    <div>
+                      <h3 className="font-medium">Two-Factor Authentication</h3>
+                      <p className="text-neutral-600 text-sm">Add an extra layer of security to your account</p>
+                    </div>
+                    <div className="flex items-center">
+                      <div className="mr-4 text-sm">
+                        <span className="px-2 py-1 bg-red-100 text-red-800 rounded-full">Disabled</span>
+                      </div>
+                      <button className="bg-primary text-white px-4 py-2 rounded text-sm font-medium">
+                        Enable
+                      </button>
+                    </div>
+                  </div>
+                </div>
+                
+                <div className="p-4 border border-neutral-200 rounded-lg">
+                  <div className="flex justify-between items-center">
+                    <div>
+                      <h3 className="font-medium">Login History</h3>
+                      <p className="text-neutral-600 text-sm">View your recent login activity</p>
+                    </div>
+                    <button className="bg-white border border-neutral-300 hover:bg-neutral-100 text-neutral-800 px-4 py-2 rounded text-sm font-medium transition duration-150">
+                      View
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+            
+            {/* Notification Settings */}
+            <div className="bg-white rounded-lg shadow-sm p-6">
+              <h2 className="text-lg font-semibold mb-4">Notification Preferences</h2>
+              <div className="space-y-4">
+                <div className="flex items-center justify-between p-3 border-b">
+                  <div>
+                    <h3 className="font-medium">New Training Modules</h3>
+                    <p className="text-neutral-600 text-sm">Get notified when new training content is available</p>
+                  </div>
+                  <div className="relative inline-block w-12 h-6 transition duration-200 ease-in-out rounded-full cursor-pointer">
+                    <input 
+                      type="checkbox"
+                      className="absolute w-6 h-6 transition duration-200 ease-in-out bg-white border-2 border-gray-300 rounded-full appearance-none cursor-pointer focus:outline-none peer checked:right-0 checked:border-primary right-6"
+                      defaultChecked
+                    />
+                    <label
+                      className="block h-full overflow-hidden rounded-full cursor-pointer bg-gray-300 peer-checked:bg-primary"
+                    ></label>
+                  </div>
+                </div>
+                
+                <div className="flex items-center justify-between p-3 border-b">
+                  <div>
+                    <h3 className="font-medium">New Threat Alerts</h3>
+                    <p className="text-neutral-600 text-sm">Be alerted about emerging social engineering threats</p>
+                  </div>
+                  <div className="relative inline-block w-12 h-6 transition duration-200 ease-in-out rounded-full cursor-pointer">
+                    <input 
+                      type="checkbox"
+                      className="absolute w-6 h-6 transition duration-200 ease-in-out bg-white border-2 border-gray-300 rounded-full appearance-none cursor-pointer focus:outline-none peer checked:right-0 checked:border-primary right-6"
+                      defaultChecked
+                    />
+                    <label
+                      className="block h-full overflow-hidden rounded-full cursor-pointer bg-gray-300 peer-checked:bg-primary"
+                    ></label>
+                  </div>
+                </div>
+                
+                <div className="flex items-center justify-between p-3 border-b">
+                  <div>
+                    <h3 className="font-medium">Achievement Milestones</h3>
+                    <p className="text-neutral-600 text-sm">Receive notifications about your progress and achievements</p>
+                  </div>
+                  <div className="relative inline-block w-12 h-6 transition duration-200 ease-in-out rounded-full cursor-pointer">
+                    <input 
+                      type="checkbox"
+                      className="absolute w-6 h-6 transition duration-200 ease-in-out bg-white border-2 border-gray-300 rounded-full appearance-none cursor-pointer focus:outline-none peer checked:right-0 checked:border-primary right-6"
+                      defaultChecked
+                    />
+                    <label
+                      className="block h-full overflow-hidden rounded-full cursor-pointer bg-gray-300 peer-checked:bg-primary"
+                    ></label>
+                  </div>
+                </div>
+                
+                <div className="flex items-center justify-between p-3 border-b">
+                  <div>
+                    <h3 className="font-medium">Policy Updates</h3>
+                    <p className="text-neutral-600 text-sm">Get notified when organization policies are updated</p>
+                  </div>
+                  <div className="relative inline-block w-12 h-6 transition duration-200 ease-in-out rounded-full cursor-pointer">
+                    <input 
+                      type="checkbox"
+                      className="absolute w-6 h-6 transition duration-200 ease-in-out bg-white border-2 border-gray-300 rounded-full appearance-none cursor-pointer focus:outline-none peer checked:right-0 checked:border-primary right-6"
+                      defaultChecked
+                    />
+                    <label
+                      className="block h-full overflow-hidden rounded-full cursor-pointer bg-gray-300 peer-checked:bg-primary"
+                    ></label>
+                  </div>
+                </div>
+                
+                <div className="flex items-center justify-between p-3">
+                  <div>
+                    <h3 className="font-medium">Email Notifications</h3>
+                    <p className="text-neutral-600 text-sm">Receive important updates via email</p>
+                  </div>
+                  <div className="relative inline-block w-12 h-6 transition duration-200 ease-in-out rounded-full cursor-pointer">
+                    <input 
+                      type="checkbox"
+                      className="absolute w-6 h-6 transition duration-200 ease-in-out bg-white border-2 border-gray-300 rounded-full appearance-none cursor-pointer focus:outline-none peer checked:right-0 checked:border-primary right-6"
+                      defaultChecked
+                    />
+                    <label
+                      className="block h-full overflow-hidden rounded-full cursor-pointer bg-gray-300 peer-checked:bg-primary"
+                    ></label>
+                  </div>
+                </div>
+              </div>
+            </div>
+            
+            {/* Appearance Settings */}
+            <div className="bg-white rounded-lg shadow-sm p-6">
+              <h2 className="text-lg font-semibold mb-4">Appearance</h2>
+              <div className="space-y-4">
+                <div className="mb-4">
+                  <h3 className="font-medium mb-2">Theme</h3>
+                  <div className="grid grid-cols-3 gap-4">
+                    <div className="border border-primary rounded-lg p-3 text-center hover:bg-neutral-50 cursor-pointer">
+                      <div className="h-12 bg-white rounded mb-2 relative overflow-hidden">
+                        <div className="h-2 bg-primary w-full"></div>
+                        <div className="absolute top-2 left-2 w-2 h-8 bg-primary"></div>
+                      </div>
+                      <div className="flex justify-center items-center">
+                        <span className="text-sm font-medium mr-1">Light</span>
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                          <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
+                          <polyline points="22 4 12 14.01 9 11.01"></polyline>
+                        </svg>
+                      </div>
+                    </div>
+                    <div className="border border-neutral-200 rounded-lg p-3 text-center hover:bg-neutral-50 cursor-pointer">
+                      <div className="h-12 bg-neutral-900 rounded mb-2 relative overflow-hidden">
+                        <div className="h-2 bg-primary w-full"></div>
+                        <div className="absolute top-2 left-2 w-2 h-8 bg-primary"></div>
+                      </div>
+                      <span className="text-sm font-medium">Dark</span>
+                    </div>
+                    <div className="border border-neutral-200 rounded-lg p-3 text-center hover:bg-neutral-50 cursor-pointer">
+                      <div className="h-12 rounded mb-2 relative overflow-hidden" style={{ background: "linear-gradient(to right, white 50%, #1a1a1a 50%)" }}>
+                        <div className="h-2 bg-primary w-full"></div>
+                        <div className="absolute top-2 left-2 w-2 h-8 bg-primary"></div>
+                      </div>
+                      <span className="text-sm font-medium">System</span>
+                    </div>
+                  </div>
+                </div>
+                
+                <div>
+                  <h3 className="font-medium mb-2">Accent Color</h3>
+                  <div className="flex space-x-2">
+                    <div className="h-8 w-8 rounded-full bg-[#9E1B32] border-2 border-white ring-2 ring-[#9E1B32] cursor-pointer"></div>
+                    <div className="h-8 w-8 rounded-full bg-blue-600 border-2 border-white cursor-pointer"></div>
+                    <div className="h-8 w-8 rounded-full bg-green-600 border-2 border-white cursor-pointer"></div>
+                    <div className="h-8 w-8 rounded-full bg-purple-600 border-2 border-white cursor-pointer"></div>
+                    <div className="h-8 w-8 rounded-full bg-orange-600 border-2 border-white cursor-pointer"></div>
+                    <div className="h-8 w-8 rounded-full bg-teal-600 border-2 border-white cursor-pointer"></div>
+                  </div>
+                </div>
+                
+                <div className="pt-4 flex justify-end">
+                  <button className="bg-primary text-white px-4 py-2 rounded text-sm font-medium">
+                    Save Appearance
+                  </button>
+                </div>
+              </div>
+            </div>
+            
+            {/* Data and Privacy */}
+            <div className="bg-white rounded-lg shadow-sm p-6">
+              <h2 className="text-lg font-semibold mb-4">Data and Privacy</h2>
+              <div className="space-y-4">
+                <div className="p-4 border border-neutral-200 rounded-lg">
+                  <div className="flex justify-between items-center">
+                    <div>
+                      <h3 className="font-medium">Download Your Data</h3>
+                      <p className="text-neutral-600 text-sm">Get a copy of your personal data and learning progress</p>
+                    </div>
+                    <button className="bg-white border border-neutral-300 hover:bg-neutral-100 text-neutral-800 px-4 py-2 rounded text-sm font-medium transition duration-150">
+                      Export
+                    </button>
+                  </div>
+                </div>
+                
+                <div className="p-4 border border-neutral-200 rounded-lg">
+                  <div className="flex justify-between items-center">
+                    <div>
+                      <h3 className="font-medium">Privacy Settings</h3>
+                      <p className="text-neutral-600 text-sm">Manage how your information is used</p>
+                    </div>
+                    <button className="bg-white border border-neutral-300 hover:bg-neutral-100 text-neutral-800 px-4 py-2 rounded text-sm font-medium transition duration-150">
+                      Manage
+                    </button>
+                  </div>
+                </div>
+                
+                <div className="p-4 border border-neutral-200 rounded-lg">
+                  <div className="flex justify-between items-center">
+                    <div>
+                      <h3 className="font-medium text-red-600">Delete Account</h3>
+                      <p className="text-neutral-600 text-sm">Permanently delete your account and all data</p>
+                    </div>
+                    <button className="bg-white border border-red-300 hover:bg-red-50 text-red-600 px-4 py-2 rounded text-sm font-medium transition duration-150">
+                      Delete
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
           </div>
         )}
       </div>

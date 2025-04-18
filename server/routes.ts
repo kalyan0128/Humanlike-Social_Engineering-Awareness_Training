@@ -598,6 +598,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const xpToNextLevel = nextLevelXp - user.xpPoints;
       const xpProgress = Math.round(((nextLevelXp - xpToNextLevel) / nextLevelXp) * 100);
       
+      // Extract user profile data (exclude sensitive info like password)
+      const { password, ...userProfileData } = user;
+      
       // Return dashboard data
       res.json({
         userProgress: {
@@ -614,7 +617,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
         policies,
         achievements,
         completedTraining,
-        acknowledgedPolicies
+        acknowledgedPolicies,
+        userProfile: userProfileData
       });
     } catch (error) {
       res.status(500).json({ message: "Error retrieving dashboard data" });

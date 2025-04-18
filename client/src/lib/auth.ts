@@ -130,6 +130,17 @@ export interface DashboardData {
     category: string;
     content?: string;
   }[];
+  // Added for settings page
+  userProfile?: {
+    id?: number;
+    username?: string;
+    firstName?: string;
+    lastName?: string;
+    email?: string;
+    bio?: string;
+    level?: string;
+    xpPoints?: number;
+  };
 }
 
 export const getDashboardData = async (): Promise<DashboardData> => {
