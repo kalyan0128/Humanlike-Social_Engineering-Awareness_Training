@@ -78,6 +78,18 @@ const mockLLMResponse = async (message: string): Promise<string> => {
 };
 
 export async function registerRoutes(app: Express): Promise<Server> {
+
+  // Dedicated route for cleaning up duplicates
+  app.post('/api/admin/cleanup-duplicates', async (req, res) => {
+    try {
+      await cleanupDuplicateScenarios();
+      res.status(200).json({ message: "Duplicate cleanup complete" });
+    } catch (error) {
+      console.error("Error in cleanup route:", error);
+      res.status(500).json({ message: "Error cleaning up duplicates" });
+    }
+  });
+  
   // Helper function to deduplicate threat scenarios by title
   async function cleanupDuplicateScenarios(): Promise<void> {
     try {
@@ -106,7 +118,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         // Delete each duplicate
         for (const id of duplicateIds) {
           try {
-            await storage.deleteThreatScenario(id);
+            await (storage as any).deleteThreatScenario(id);
             console.log(`Successfully deleted duplicate threat scenario ID: ${id}`);
           } catch (err) {
             console.error(`Error deleting duplicate threat scenario ID: ${id}`, err);
