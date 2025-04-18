@@ -118,7 +118,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
       await cleanupDuplicateScenarios();
       
       // Add first scenario - Deepfake Fraud
-      const scenario1 = await storage.addThreatScenario({
+      // Use type assertion to tell TypeScript this method exists in storage-pg
+      const scenario1 = await (storage as any).addThreatScenario({
         title: "Deepfake Fraud",
         description: "Increasingly realistic AI-generated media is enabling sophisticated impersonation attacks.",
         content: "# Deepfake Fraud: The Growing Threat of AI-Powered Impersonation\n\nDeepfakes are synthetic media created using artificial intelligence that can superimpose faces, manipulate voices, or generate entirely fabricated content that appears remarkably genuine.\n\nAs this technology becomes more accessible, social engineers are weaponizing deepfakes for various fraudulent activities including executive impersonation, biometric authentication bypass, and relationship manipulation.\n\nDetection techniques include watching for visual inconsistencies, audio discrepancies, contextual analysis, and implementing verification protocols for high-risk requests.\n\nProtection strategies include using multi-factor authentication, establishing communication protocols for financial transactions, conducting awareness training, and creating authentication code words for sensitive communications.",
@@ -128,7 +129,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       });
 
       // Add second scenario - Supply Chain Attacks
-      const scenario2 = await storage.addThreatScenario({
+      const scenario2 = await (storage as any).addThreatScenario({
         title: "Supply Chain Attacks",
         description: "Targeting the less-secure elements in a supply chain to compromise the ultimate target.",
         content: "# Supply Chain Attacks: Exploiting the Weakest Links\n\nSupply chain attacks target organizations by exploiting vulnerabilities in their vendor networks rather than attacking well-defended targets directly.\n\nThese attacks follow a pattern: reconnaissance of vendors, vulnerability analysis to find the weakest link, initial compromise of the supplier, establishing persistence, pivoting to the ultimate target, and finally exploitation.\n\nCommon vectors include software supply chain attacks (like SolarWinds), hardware supply chain attacks (malicious components), and third-party service provider compromises.\n\nDefense strategies include vendor risk management (due diligence, monitoring, contractual requirements), software security practices (verifying downloads, controlled deployment), and operational security measures (network segmentation, verification protocols for unusual requests).",
@@ -138,7 +139,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       });
 
       // Add third scenario - Business Email Compromise
-      const scenario3 = await storage.addThreatScenario({
+      const scenario3 = await (storage as any).addThreatScenario({
         title: "Business Email Compromise",
         description: "Sophisticated email scams targeting businesses to conduct unauthorized fund transfers.",
         content: "# Business Email Compromise: The Billion-Dollar Threat\n\nBusiness Email Compromise (BEC) is a sophisticated scam targeting businesses with social engineering tactics to trick employees into making unauthorized fund transfers or revealing sensitive information.\n\nCommon scenarios include CEO fraud (urgent wire transfer requests), vendor/supplier swindles (modified payment instructions), attorney impersonation (time-sensitive legal matters), and data theft variants targeting sensitive company information.\n\nWarning signs include requests for urgency or secrecy, slight variations in email addresses, grammar inconsistencies, changed payment details, pressure to act quickly, and communication limited to email only.\n\nProtection requires both organizational controls (verification protocols, approval processes, employee training) and individual vigilance (verifying unusual requests through different channels, checking email addresses carefully).",
@@ -159,7 +160,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.post('/api/admin/add-policies', async (req, res) => {
     try {
       // Add Mobile Device Security Policy
-      await storage.addOrganizationPolicy({
+      await (storage as any).addOrganizationPolicy({
         title: "Mobile Device Security Policy",
         description: "Guidelines for securing mobile devices that access organizational data.",
         category: "device-security",
@@ -167,7 +168,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       });
 
       // Add Remote Work Security Policy
-      await storage.addOrganizationPolicy({
+      await (storage as any).addOrganizationPolicy({
         title: "Remote Work Security Policy",
         description: "Security requirements for employees working outside traditional office environments.",
         category: "remote-work",
@@ -175,7 +176,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       });
 
       // Add Social Media Security Policy
-      await storage.addOrganizationPolicy({
+      await (storage as any).addOrganizationPolicy({
         title: "Social Media Security Policy",
         description: "Guidelines for secure and responsible use of social media platforms.",
         category: "communications",
