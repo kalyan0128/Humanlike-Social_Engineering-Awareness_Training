@@ -83,6 +83,11 @@ export interface DashboardData {
     id: number;
     title: string;
     description: string;
+    type?: string;
+    difficulty?: string;
+    xpReward?: number;
+    content?: string;
+    order?: number;
   }[];
   latestThreats: {
     id: number;
@@ -90,18 +95,40 @@ export interface DashboardData {
     description: string;
     isNew: boolean;
     isTrending: boolean;
+    difficulty?: string;
+    content?: string;
   }[];
   policies: {
     id: number;
     title: string;
     description: string;
     category: string;
+    content?: string;
   }[];
   achievements: {
     id: number;
     title: string;
     description: string;
     icon: string;
+    requiredXp?: number;
+  }[];
+  // Added new fields for the progress page
+  completedTraining?: {
+    id: number;
+    title: string;
+    description: string;
+    type?: string;
+    difficulty?: string;
+    xpReward?: number;
+    content?: string;
+    order?: number;
+  }[];
+  acknowledgedPolicies?: {
+    id: number;
+    title: string;
+    description: string;
+    category: string;
+    content?: string;
   }[];
 }
 

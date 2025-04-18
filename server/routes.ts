@@ -526,13 +526,40 @@ export async function registerRoutes(app: Express): Promise<Server> {
       
       // Get next recommended modules - increased limit to show new cryptography and MITM modules
       const recommendedModules = await storage.getNextRecommendedModules(userId, 4);
-      console.log("Recommended modules:", recommendedModules);
+      
+      // Get all training modules to create a complete list of completed modules
+      const allModules = await storage.getTrainingModules();
+      
+      // Get completed training modules
+      const completedTraining = [];
+      for (const progressItem of progress) {
+        if (progressItem.completed) {
+          const module = allModules.find(m => m.id === progressItem.moduleId);
+          if (module) {
+            completedTraining.push(module);
+          }
+        }
+      }
       
       // Get latest threat scenarios - increased limit to show 5 scenarios
       const latestThreats = await storage.getThreatScenarios(5);
       
       // Get organization policies - increased limit to show all policies
-      const policies = await storage.getOrganizationPolicies(10);
+      const allPolicies = await storage.getOrganizationPolicies(10);
+      
+      // Filter for acknowledged policies
+      const acknowledgedPolicies = [];
+      for (const progressItem of progress) {
+        if (progressItem.policyId && progressItem.completed) {
+          const policy = allPolicies.find(p => p.id === progressItem.policyId);
+          if (policy) {
+            acknowledgedPolicies.push(policy);
+          }
+        }
+      }
+      
+      // Non-acknowledged policies for the overview
+      const policies = allPolicies.filter(p => !acknowledgedPolicies.some(ap => ap.id === p.id)).slice(0, 3);
       
       // Get user achievements
       const userAchievementIds = (await storage.getUserAchievements(userId)).map(ua => ua.achievementId);
@@ -563,7 +590,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
         recommendedModules,
         latestThreats,
         policies,
-        achievements
+        achievements,
+        completedTraining,
+        acknowledgedPolicies
       });
     } catch (error) {
       res.status(500).json({ message: "Error retrieving dashboard data" });
