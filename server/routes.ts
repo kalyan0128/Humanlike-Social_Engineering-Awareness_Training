@@ -547,19 +547,41 @@ export async function registerRoutes(app: Express): Promise<Server> {
       // Get organization policies - increased limit to show all policies
       const allPolicies = await storage.getOrganizationPolicies(10);
       
-      // Filter for acknowledged policies
+      // For acknowledged policies, we'll check for completed modules with names matching policy titles
+      // This is a workaround until we extend the schema to include a proper policyId field
       const acknowledgedPolicies = [];
+      const policyTitlesToModuleMap = new Map();
+      
+      // Create a map of policy titles to modules that might be related to policies
+      for (const module of allModules) {
+        if (module.type === 'policy' || module.title.toLowerCase().includes('policy')) {
+          // Extract policy name from module title for matching
+          const moduleName = module.title.toLowerCase();
+          // Map this module to possible policy matches
+          for (const policy of allPolicies) {
+            if (moduleName.includes(policy.title.toLowerCase()) || 
+                policy.title.toLowerCase().includes(moduleName)) {
+              policyTitlesToModuleMap.set(module.id, policy.id);
+            }
+          }
+        }
+      }
+      
+      // Find acknowledged policies based on completed modules
       for (const progressItem of progress) {
-        if (progressItem.policyId && progressItem.completed) {
-          const policy = allPolicies.find(p => p.id === progressItem.policyId);
-          if (policy) {
+        if (progressItem.completed && policyTitlesToModuleMap.has(progressItem.moduleId)) {
+          const policyId = policyTitlesToModuleMap.get(progressItem.moduleId);
+          const policy = allPolicies.find(p => p.id === policyId);
+          if (policy && !acknowledgedPolicies.some(ap => ap.id === policy.id)) {
             acknowledgedPolicies.push(policy);
           }
         }
       }
       
-      // Non-acknowledged policies for the overview
-      const policies = allPolicies.filter(p => !acknowledgedPolicies.some(ap => ap.id === p.id)).slice(0, 3);
+      // Non-acknowledged policies for the overview (show 3 policies that haven't been acknowledged)
+      const policies = allPolicies
+        .filter(p => !acknowledgedPolicies.some(ap => ap.id === p.id))
+        .slice(0, 3);
       
       // Get user achievements
       const userAchievementIds = (await storage.getUserAchievements(userId)).map(ua => ua.achievementId);
