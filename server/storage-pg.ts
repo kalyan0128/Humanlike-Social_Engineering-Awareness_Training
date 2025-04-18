@@ -491,7 +491,7 @@ export class DatabaseStorage implements IStorage {
     return trainingModule;
   }
   
-  private async addThreatScenario(scenario: InsertThreatScenario): Promise<ThreatScenario> {
+  async addThreatScenario(scenario: InsertThreatScenario): Promise<ThreatScenario> {
     const [threatScenario] = await db
       .insert(threatScenarios)
       .values(scenario)

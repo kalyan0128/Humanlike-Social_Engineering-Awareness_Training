@@ -78,9 +78,45 @@ const mockLLMResponse = async (message: string): Promise<string> => {
 };
 
 export async function registerRoutes(app: Express): Promise<Server> {
-  // Route to add new threat scenarios
+  // Helper function to deduplicate threat scenarios by title
+  async function cleanupDuplicateScenarios(): Promise<void> {
+    try {
+      // Get all scenarios
+      const allScenarios = await storage.getThreatScenarios();
+      
+      // Create a map to track seen titles and their first occurrence
+      const titleMap = new Map<string, number>();
+      const duplicateIds: number[] = [];
+      
+      // Identify duplicates
+      allScenarios.forEach(scenario => {
+        if (titleMap.has(scenario.title)) {
+          // This is a duplicate, mark for removal
+          duplicateIds.push(scenario.id);
+        } else {
+          // First time seeing this title
+          titleMap.set(scenario.title, scenario.id);
+        }
+      });
+      
+      // Log info about duplicates (can't delete them without modifying the storage interface)
+      if (duplicateIds.length > 0) {
+        console.log(`Found ${duplicateIds.length} duplicate threat scenarios. IDs: ${duplicateIds.join(', ')}`);
+        console.log("Please remove these duplicates manually from the database.");
+      } else {
+        console.log("No duplicate threat scenarios found.");
+      }
+    } catch (error) {
+      console.error("Error cleaning up duplicate threat scenarios:", error);
+    }
+  }
+
+// Route to add new threat scenarios
   app.post('/api/admin/add-threat-scenarios', async (req, res) => {
     try {
+      // Clean up any existing duplicates first
+      await cleanupDuplicateScenarios();
+      
       // Add first scenario - Deepfake Fraud
       const scenario1 = await storage.addThreatScenario({
         title: "Deepfake Fraud",
@@ -470,8 +506,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const recommendedModules = await storage.getNextRecommendedModules(userId, 4);
       console.log("Recommended modules:", recommendedModules);
       
-      // Get latest threat scenarios
-      const latestThreats = await storage.getThreatScenarios(2);
+      // Get latest threat scenarios - increased limit to show 5 scenarios
+      const latestThreats = await storage.getThreatScenarios(5);
       
       // Get organization policies - increased limit to show all policies
       const policies = await storage.getOrganizationPolicies(10);
