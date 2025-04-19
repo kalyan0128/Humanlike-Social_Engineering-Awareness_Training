@@ -1,6 +1,6 @@
 {
   "version": 2,
-  "buildCommand": "npm run build",
+  "buildCommand": "sh ./vercel-build.sh",
   "outputDirectory": "dist",
   "routes": [
     {
@@ -8,8 +8,11 @@
       "dest": "/index.js"
     },
     {
+      "handle": "filesystem"
+    },
+    {
       "src": "/(.*)",
-      "dest": "/server/public/$1"
+      "dest": "/server/public/index.html"
     }
   ],
   "env": {
