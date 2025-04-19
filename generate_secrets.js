@@ -1,4 +1,4 @@
-const crypto = require('crypto');
+import crypto from 'crypto';
 
 console.log('\n========= ENVIRONMENT VARIABLES FOR VERCEL DEPLOYMENT =========\n');
 
