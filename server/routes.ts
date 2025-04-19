@@ -356,9 +356,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
       });
       
       res.status(200).json({ message: "New training modules added successfully" });
-    } catch (error) {
+    } catch (error: any) {
       console.error("Error adding new modules:", error);
-      res.status(500).json({ message: "Failed to add new modules", error: error.message });
+      res.status(500).json({ message: "Failed to add new modules", error: error?.message || 'Unknown error' });
     }
   });
   const httpServer = createServer(app);
@@ -518,8 +518,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
       
       // For acknowledged policies, we'll check for completed modules with names matching policy titles
       // This is a workaround until we extend the schema to include a proper policyId field
-      const acknowledgedPolicies = [];
-      const policyTitlesToModuleMap = new Map();
+      const acknowledgedPolicies: typeof allPolicies = [];
+      const policyTitlesToModuleMap = new Map<number, number>();
       
       // Create a map of policy titles to modules that might be related to policies
       for (const module of allModules) {
