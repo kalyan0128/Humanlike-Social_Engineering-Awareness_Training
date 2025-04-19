@@ -3,9 +3,10 @@ set -e
 
 echo "Starting Vercel build process for HumanLike-AwareBot..."
 
-# Install dependencies
+# Install dependencies including vite globally
 echo "Installing dependencies..."
 npm ci
+npm install -g vite esbuild
 
 # Create .env file from Vercel environment variables if needed
 echo "Setting up environment..."
@@ -15,10 +16,15 @@ else
   echo "Warning: DATABASE_URL is not set, database functionality may not work"
 fi
 
-# Build the application - use npx to ensure binaries are found
-echo "Building application..."
-npx vite build
-npx esbuild server/index.ts --platform=node --packages=external --bundle --format=esm --outdir=dist
+# Build the client first
+echo "Building client..."
+cd client
+vite build
+cd ..
+
+# Build the server
+echo "Building server..."
+esbuild server/index.ts --platform=node --packages=external --bundle --format=esm --outdir=dist
 
 # Push database schema
 if [ -n "$DATABASE_URL" ]; then
