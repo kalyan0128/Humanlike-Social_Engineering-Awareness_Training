@@ -1,17 +1,37 @@
 #!/bin/bash
+set -e
 
-# This script runs during Vercel build to set up the project correctly
+echo "Starting Vercel build process for HumanLike-AwareBot..."
 
-echo "Starting Vercel build process..."
+# Install dependencies
+echo "Installing dependencies..."
+npm ci
 
-# Run the main build process
+# Create .env file from Vercel environment variables if needed
+echo "Setting up environment..."
+if [ -n "$DATABASE_URL" ]; then
+  echo "DATABASE_URL is set"
+else
+  echo "Warning: DATABASE_URL is not set, database functionality may not work"
+fi
+
+# Build the application
+echo "Building application..."
 npm run build
 
-# Create public directory in the server directory for static files
+# Push database schema
+if [ -n "$DATABASE_URL" ]; then
+  echo "Pushing database schema..."
+  npm run db:push
+else
+  echo "Skipping database schema push due to missing DATABASE_URL"
+fi
+
+# Create the output directory structure for Vercel
 mkdir -p dist/server/public
 
-# Copy client files to the server/public directory where vite.ts expects them
-echo "Copying client files to server/public directory..."
-cp -r dist/client/* dist/server/public/
+# Copy static files to the public directory
+echo "Copying static assets..."
+cp -r client/dist/* dist/server/public/
 
-echo "Vercel build completed successfully!"
+echo "Build completed successfully!"

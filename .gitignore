@@ -1,14 +1,18 @@
 # Dependencies
-node_modules
-/.pnp
+node_modules/
+.pnp/
 .pnp.js
 
-# Production build files
-/dist
-/build
-/server/public
+# Testing
+coverage/
 
-# Environment variables
+# Production build
+dist/
+build/
+out/
+
+# Development files
+.DS_Store
 .env
 .env.local
 .env.development.local
@@ -19,23 +23,30 @@ node_modules
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
-logs
-*.log
+.pnpm-debug.log*
 
-# System files
-.DS_Store
-Thumbs.db
-
-# IDE files
-/.idea
-/.vscode
+# Editor specific files
+.idea/
+.vscode/
 *.swp
 *.swo
 
+# Runtime data
+pids/
+*.pid
+*.seed
+*.pid.lock
+
+# Drizzle migrations
+/drizzle/
+
+# Replit specific
+.replit
+replit.nix
+.cache/
+
+# Generated styles
+**/.next/
+
 # Vercel
 .vercel
-.now
-
-# Misc
-vite.config.ts.*
-*.tar.gz

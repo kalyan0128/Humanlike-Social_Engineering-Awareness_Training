@@ -1,60 +1,100 @@
 # HumanLike-AwareBot: Social Engineering Awareness Training Platform
 
-## About
+A cutting-edge academic web application designed to enhance social engineering awareness through an interactive, gamified training platform powered by advanced AI technologies.
 
-HumanLike-AwareBot is a cutting-edge academic web application designed to enhance social engineering awareness through an interactive, gamified training platform powered by advanced AI technologies. This project is developed by Kalyankumar Konda and Baji Narra, under the guidance of project adviser Samuel Tweneboah-Koduah, Ph.D. at Gannon University.
+![HumanLike-AwareBot Logo](generated-icon.png)
 
-## Key Features
+## Project Overview
 
-- Interactive training modules with multiple difficulty levels
-- Gamified chatbot scenarios powered by Groq LLM (Llama 3 8B)
-- Progress tracking with XP points and achievements
-- Social engineering threat awareness scenarios
-- Organization policy management
+HumanLike-AwareBot is an educational platform developed at Gannon University to help users recognize, understand, and defend against social engineering attacks. It uses an AI-powered chatbot to simulate realistic social engineering scenarios and provide personalized feedback.
+
+### Key Features
+
+- **Interactive Training Modules**: Learn through engaging, scenario-based lessons with quizzes.
+- **AI-Powered Chatbot**: Practice identifying social engineering techniques in realistic conversations (Powered by Groq Llama 3 8B).
+- **Threat Scenario Library**: Study real-world examples of social engineering attacks.
+- **Organization Policy Reference**: Access comprehensive security policies and best practices.
+- **Progress Tracking**: Monitor learning achievements and improvement areas.
+- **Gamified Experience**: Earn achievements and gain experience points as you learn.
 
 ## Technology Stack
 
-- **Frontend**: React with TypeScript, Tailwind CSS, Shadcn/UI
-- **Backend**: Node.js, Express
+- **Frontend**: React, TypeScript, Tailwind CSS, Shadcn UI
+- **Backend**: Express.js, Node.js
 - **Database**: PostgreSQL with Drizzle ORM
-- **AI Integration**: Groq API with Llama 3 8B
+- **AI Integration**: Groq LLM API (Llama 3 8B model)
+- **Authentication**: JWT-based auth with secure password hashing
 
-## Deployment to Vercel
+## Getting Started
 
-To deploy this application to Vercel, follow these steps:
+### Prerequisites
 
-1. **Push to GitHub**:
-   - Create a new GitHub repository
-   - Push this code to the repository
-   
-2. **Connect to Vercel**:
-   - Create a Vercel account at https://vercel.com
-   - Click "New Project" and select your GitHub repository
-   - Import the project
-   
-3. **Configure Environment Variables**:
-   In the Vercel project settings, add the following environment variables:
-   - `DATABASE_URL`: Your PostgreSQL database connection string
-   - `GROQ_API_KEY`: Your Groq API key for LLM functionality
-   - `SESSION_SECRET`: A random string for session encryption
-   
-4. **Deploy**:
-   - Click "Deploy" and Vercel will automatically build and deploy your application
+- Node.js 18+ 
+- PostgreSQL database (for production)
+- Groq API key for chatbot functionality
 
-## Environment Variables Required
+### Installation
 
-- `DATABASE_URL`: PostgreSQL connection string
-- `GROQ_API_KEY`: Groq API key for the chatbot
-- `SESSION_SECRET`: Secret for encrypting session data
+1. Clone the repository:
+   ```bash
+   git clone https://github.com/yourusername/humanlike-awarebot.git
+   cd humanlike-awarebot
+   ```
 
-## Running Locally
+2. Install dependencies:
+   ```bash
+   npm install
+   ```
 
-1. Clone the repository
-2. Install dependencies with `npm install`
-3. Set up environment variables in a `.env` file
-4. Run database migrations with `npm run db:push`
-5. Start the development server with `npm run dev`
+3. Set up environment variables:
+   ```bash
+   cp .env.example .env
+   # Edit the .env file with your configuration
+   ```
+
+4. Start the development server:
+   ```bash
+   npm run dev
+   ```
+
+5. Open http://localhost:5000 in your browser.
+
+### Deploying to Production
+
+See [DEPLOYMENT.md](DEPLOYMENT.md) for detailed instructions on deploying to Vercel.
+
+## Project Structure
+
+```
+├── client/               # Frontend code
+│   ├── src/              # React application
+│   │   ├── components/   # UI components
+│   │   ├── hooks/        # Custom React hooks
+│   │   ├── lib/          # Utility functions
+│   │   ├── pages/        # Page components
+│   │   └── ...
+├── server/               # Backend code
+│   ├── services/         # Service modules (LLM, etc.)
+│   ├── routes.ts         # API routes
+│   ├── storage.ts        # Data access layer
+│   └── ...
+├── shared/               # Shared code between client and server
+│   └── schema.ts         # Database schema and types
+└── ...
+```
+
+## Academic Acknowledgements
+
+This project was developed at Gannon University by:
+
+- **Team Members**: Kalyankumar Konda, Baji Narra
+- **Project Adviser**: Samuel Tweneboah-Koduah, Ph.D.
+
+## License
+
+This project is academic software and is not available for commercial use without permission.
 
 ## Acknowledgements
 
-This project is developed as part of academic research at Gannon University, focusing on cybersecurity education and social engineering awareness.
+- Groq for providing the LLM API
+- [List other acknowledgements here]
