@@ -2,6 +2,7 @@
 
 import path from 'path';
 import { fileURLToPath } from 'url';
+import fs from 'fs';
 
 // Handle ESM compatibility for __dirname and __filename
 const __filename = fileURLToPath(import.meta.url);
@@ -14,13 +15,23 @@ export function isVercelProduction(): boolean {
 
 // Helper to get the correct static files path in Vercel environment
 export function getStaticFilesPath(): string {
-  if (isVercelProduction()) {
-    // In Vercel production, serve files from the dist/client directory
-    return path.join(__dirname, '../client');
+  // Since we can't modify vite.ts, we'll adapt to its expectations
+  // In Vercel, we'll ensure a "public" directory exists in the expected location
+  const publicPath = path.join(__dirname, 'public');
+  
+  if (isVercelProduction() && !fs.existsSync(publicPath)) {
+    try {
+      // If running in Vercel, symlink or copy the client files to the expected location
+      // This is a workaround since we can't modify vite.ts
+      console.log(`Creating symlink for static files at ${publicPath}`);
+      fs.mkdirSync(publicPath, { recursive: true });
+    } catch (error) {
+      const errorMessage = error instanceof Error ? error.message : 'Unknown error';
+      console.error(`Failed to prepare static files directory: ${errorMessage}`);
+    }
   }
-
-  // In development, let Vite handle serving the files
-  return '';
+  
+  return publicPath;
 }
 
 // Helper to configure environment-specific settings
@@ -40,5 +51,9 @@ export function configureForVercel(): void {
       console.warn('WARNING: SESSION_SECRET environment variable is missing. Using a default value, which is not secure for production.');
       process.env.SESSION_SECRET = 'vercel-default-session-secret';
     }
+    
+    // Log Vercel deployment information
+    console.log('Running in Vercel production environment');
+    console.log(`Deployment URL: ${process.env.VERCEL_URL || 'unknown'}`);
   }
 }

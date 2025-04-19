@@ -48,12 +48,16 @@ This guide will walk you through the process of deploying your HumanLike-AwareBo
 3. Configure project settings:
    - Project Name: humanlike-awarebot (or your preferred name)
    - Framework Preset: Leave as "Other"
-   - Build and Output Settings: Leave as default (they'll be pulled from vercel.json)
+   - Build and Output Settings: 
+     * The project is already configured with a `vercel.json` file containing the necessary build settings
+     * The custom build command (`sh ./vercel-build.sh`) will handle building both the server and client parts
+     * The output directory is set to `dist`
    - Environment Variables: Add the following variables:
      * `DATABASE_URL`: Your PostgreSQL connection string
      * `GROQ_API_KEY`: Your Groq API key
      * `SESSION_SECRET`: A random string for session encryption (you can generate one at https://1password.com/password-generator/)
      * `NODE_ENV`: Set to "production"
+     * `VERCEL`: Set to "1" (this enables Vercel-specific optimizations)
 
 4. Click "Deploy"
 
