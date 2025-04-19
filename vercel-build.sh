@@ -15,9 +15,10 @@ else
   echo "Warning: DATABASE_URL is not set, database functionality may not work"
 fi
 
-# Build the application
+# Build the application - use npx to ensure binaries are found
 echo "Building application..."
-npm run build
+npx vite build
+npx esbuild server/index.ts --platform=node --packages=external --bundle --format=esm --outdir=dist
 
 # Push database schema
 if [ -n "$DATABASE_URL" ]; then
