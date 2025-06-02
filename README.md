@@ -97,4 +97,3 @@ This project is academic software and is not available for commercial use withou
 ## Acknowledgements
 
 - Groq for providing the LLM API
-- [List other acknowledgements here]
